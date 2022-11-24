@@ -1,26 +1,34 @@
-syntax="proto3";
+syntax = "proto3";
 
-option go_package="simone/api";
+option go_package = "simone/api";
 
 package api;
 
 service InspectService {
-    rpc Inspect(InspectRequest) returns (InspectResponse);
+  rpc Inspect (InspectRequest) returns (InspectResponse);
+}
+message InspectRequest {
+  string id = 1;
 }
 
-message InspectRequest{
-    string id = 1;
-}
-message InspectResponse{
-    map<string,Object> objects = 1;
+message InspectResponse {
+  map <string,Object> objects = 1;
 }
 
 message Object {
-    string id = 1;
-	repeated Field fields = 2;
+  string id = 1;
+
+  oneof literal {
+    string string_val = 2;
+    int64  int_val    = 3;
+    bool   bool_val   = 4;
+  }
+           string object_class = 20;
+  repeated Field  fields       = 21;
 }
 
 message Field {
-    string name = 1;
-    string json_value = 2;
+  string name       = 1;
+  string json_value = 2;
 }
+
