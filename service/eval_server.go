@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/dop251/goja"
 	"github.com/emicklei/simone/api"
@@ -18,8 +19,14 @@ func NewEvalServer() *EvalServer {
 	}
 }
 
-func (e *EvalServer) Eval(context.Context, *api.EvalRequest) (*api.EvalResponse, error) {
+func (e *EvalServer) Eval(ctx context.Context, req *api.EvalRequest) (*api.EvalResponse, error) {
+	result, err := e.vm.RunString(req.Source)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(result)
 	r := new(api.EvalResponse)
 	r.Result = new(api.Object)
+	// r.Result.Fields = append(r.Result.Fields, )
 	return r, nil
 }

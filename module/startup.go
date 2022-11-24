@@ -2,6 +2,7 @@ package module
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 
 	"github.com/emicklei/simone/api"
@@ -19,13 +20,13 @@ func Start(cfg Config) {
 		AllowCredentials: true,
 	})
 	grpcServer := grpc.NewServer()
-	wrappedGrpc := grpcweb.WrapServer(grpcServer)
 
 	// services
 	api.RegisterInspectServiceServer(grpcServer, new(service.InspectServer))
 	api.RegisterEvaluationServiceServer(grpcServer, service.NewEvalServer())
 
-	// routing
+	// web routing
+	wrappedGrpc := grpcweb.WrapServer(grpcServer)
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(resp http.ResponseWriter, req *http.Request) {
 		if wrappedGrpc.IsGrpcWebRequest(req) {
@@ -35,6 +36,16 @@ func Start(cfg Config) {
 		// Fall back to other servers.
 		mux.ServeHTTP(resp, req)
 	})
-	fmt.Println("gRPC on localhost", cfg.Apiaddr)
-	http.ListenAndServe(cfg.Apiaddr, cc.Handler(mux))
+	fmt.Println("gRPC web on localhost:" + cfg.GrpcWebAddr)
+	go func() {
+		panic(http.ListenAndServe(cfg.GrpcWebAddr, cc.Handler(mux)))
+	}()
+
+	// grpc routing
+	fmt.Println("gRPC on localhost" + cfg.GrpcAddr)
+	lis, err := net.Listen("tcp", cfg.GrpcAddr)
+	if err != nil {
+		panic(err.Error())
+	}
+	grpcServer.Serve(lis)
 }
