@@ -1,0 +1,21 @@
+syntax="proto3";
+
+option go_package="simone/api";
+
+import "api/inspection.proto";
+
+package api;
+
+service EvaluationService {
+    rpc Eval(EvalRequest) returns (EvalResponse);
+}
+
+message EvalRequest{
+    string source = 1;
+}
+message EvalResponse{
+    Object result = 1;
+    string error = 20;
+    int32 error_line = 21;
+    int32 error_col = 22; 
+}
