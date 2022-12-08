@@ -37,11 +37,11 @@ func main() {
 				continue
 			}
 		}
+		line.AppendHistory(entry)
 		v, err := RunString(eval, entry)
 		if err != nil {
 			fmt.Println(err)
 		} else {
-			line.AppendHistory(entry)
 			fmt.Printf("\033[1;33m%v\033[0m\n", v)
 		}
 	}
