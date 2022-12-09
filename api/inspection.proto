@@ -6,6 +6,7 @@ package api;
 
 service InspectService {
   rpc Inspect (InspectRequest) returns (InspectResponse);
+  rpc PrintString (PrintStringRequest) returns (PrintStringResponse);
 }
 message InspectRequest {
   string id = 1;
@@ -15,9 +16,16 @@ message InspectResponse {
   map <string,Object> objects = 1;
 }
 
+message PrintStringRequest {
+  string id = 1;
+}
+
+message PrintStringResponse {
+  string content = 1;
+}
+
 message Object {
   string id = 1;
-
   oneof literal {
     string string_val = 2;
     int64  int_val    = 3;
@@ -31,4 +39,3 @@ message Field {
   string name       = 1;
   string json_value = 2;
 }
-

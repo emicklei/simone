@@ -22,11 +22,13 @@ func Start(cfg Config) {
 	grpcServer := grpc.NewServer()
 
 	// services
-	eval := service.NewEvalServer()
+	space := service.NewObjectSpace()
+	eval := service.NewEvalServer(space)
 	for _, each := range cfg.Initializers {
 		eval.Initialize(each)
 	}
-	api.RegisterInspectServiceServer(grpcServer, new(service.InspectServer))
+	insp := service.NewInspectServer(space)
+	api.RegisterInspectServiceServer(grpcServer, insp)
 	api.RegisterEvaluationServiceServer(grpcServer, eval)
 
 	// web routing

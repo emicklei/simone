@@ -2,20 +2,42 @@ package service
 
 import (
 	"context"
+	"log"
 
 	"github.com/emicklei/simone/api"
 )
 
 type InspectServer struct {
 	api.UnimplementedInspectServiceServer
+	space *ObjectSpace
 }
 
-func (i *InspectServer) Inspect(context.Context, *api.InspectRequest) (*api.InspectResponse, error) {
-	r := new(api.InspectResponse)
-	r.Objects = map[string]*api.Object{
-		"1": {
-			Id: "1",
-		},
+func NewInspectServer(s *ObjectSpace) *InspectServer {
+	return &InspectServer{
+		space: s,
 	}
-	return r, nil
+}
+
+func (i *InspectServer) Inspect(ctx context.Context, req *api.InspectRequest) (*api.InspectResponse, error) {
+	log.Println("Inspect", req.Id)
+	resp := new(api.InspectResponse)
+
+	v := i.space.Get(req.Id)
+	if v == nil {
+	}
+
+	return resp, nil
+}
+
+func (i *InspectServer) PrintString(ctx context.Context, req *api.PrintStringRequest) (*api.PrintStringResponse, error) {
+	log.Println("PrintString", req.Id)
+	resp := new(api.PrintStringResponse)
+
+	v := i.space.Get(req.Id)
+	if v == nil {
+		resp.Content = "null"
+	} else {
+		resp.Content = v.String()
+	}
+	return resp, nil
 }

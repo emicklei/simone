@@ -20,6 +20,7 @@ func main() {
 	}
 	defer conn.Close()
 	eval := api.NewEvaluationServiceClient(conn)
+	insp := api.NewInspectServiceClient(conn)
 
 	defer line.Close()
 	for {
@@ -38,22 +39,29 @@ func main() {
 			}
 		}
 		line.AppendHistory(entry)
-		v, err := RunString(eval, entry)
+		v, err := RunString(eval, insp, entry)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Printf("\043[1;33m%v\043[0m\n", err)
 		} else {
 			fmt.Printf("\033[1;33m%v\033[0m\n", v)
 		}
 	}
 exit:
 }
-func RunString(client api.EvaluationServiceClient, entry string) (any, error) {
+func RunString(eval api.EvaluationServiceClient,
+	insp api.InspectServiceClient,
+	entry string) (any, error) {
 	req := new(api.EvalRequest)
 	req.Source = entry
-	repl, err := client.Eval(context.Background(), req)
+	repl, err := eval.Eval(context.Background(), req)
 	if err != nil {
 		return nil, err
 	}
-	res := repl.Result
-	return res, nil
+	req2 := new(api.PrintStringRequest)
+	req2.Id = repl.RemoteObjectId
+	repl2, err := insp.PrintString(context.Background(), req2)
+	if err != nil {
+		return nil, err
+	}
+	return repl2.Content, nil
 }
