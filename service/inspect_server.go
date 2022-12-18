@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/emicklei/simone/api"
@@ -37,7 +38,8 @@ func (i *InspectServer) PrintString(ctx context.Context, req *api.PrintStringReq
 	if v == nil {
 		resp.Content = "null"
 	} else {
-		resp.Content = v.String()
+		v.ExportType()
+		resp.Content = fmt.Sprintf("%#v", v.Export())
 	}
 	return resp, nil
 }

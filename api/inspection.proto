@@ -13,7 +13,7 @@ message InspectRequest {
 }
 
 message InspectResponse {
-  map <string,Object> objects = 1;
+  Object target = 1;
 }
 
 message PrintStringRequest {
@@ -37,5 +37,5 @@ message Object {
 
 message Field {
   string name       = 1;
-  string json_value = 2;
+  string object_id  = 2;
 }

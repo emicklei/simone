@@ -1,7 +1,7 @@
 package module
 
 import (
-	"fmt"
+	"log"
 	"net"
 	"net/http"
 
@@ -42,13 +42,13 @@ func Start(cfg Config) {
 		// Fall back to other servers.
 		mux.ServeHTTP(resp, req)
 	})
-	fmt.Println("gRPC web on localhost:" + cfg.GrpcWebAddr)
+	log.Println("gRPC web on localhost:" + cfg.GrpcWebAddr)
 	go func() {
 		panic(http.ListenAndServe(cfg.GrpcWebAddr, cc.Handler(mux)))
 	}()
 
 	// grpc routing
-	fmt.Println("gRPC on localhost" + cfg.GrpcAddr)
+	log.Println("gRPC on localhost" + cfg.GrpcAddr)
 	lis, err := net.Listen("tcp", cfg.GrpcAddr)
 	if err != nil {
 		panic(err.Error())

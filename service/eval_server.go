@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/dop251/goja"
+	"github.com/emicklei/simone"
 	"github.com/emicklei/simone/api"
 )
 
@@ -23,8 +24,9 @@ func NewEvalServer(s *ObjectSpace) *EvalServer {
 	}
 }
 
-func (e *EvalServer) Initialize(extension VMInitializer) {
-	extension(e.vm)
+func (e *EvalServer) Initialize(extension simone.Plugin) {
+	log.Println("initializing plugin:", extension.Namespace())
+	extension.Start(e.vm)
 }
 
 func (e *EvalServer) Eval(ctx context.Context, req *api.EvalRequest) (*api.EvalResponse, error) {
