@@ -1,4 +1,4 @@
-package service
+package module
 
 import (
 	"github.com/dop251/goja"
