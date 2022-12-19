@@ -1,6 +1,7 @@
 package module
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -28,6 +29,12 @@ func NewActionHandler(cfg Config) *ActionHandler {
 }
 
 func (h *ActionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ap := simone.NewActionParams(r.URL)
-	log.Println(ap)
+	ap := simone.NewActionParams(r)
+	result, err := h.vm.RunString(ap.Source)
+	if err != nil {
+		fmt.Fprint(w, err.Error())
+		return
+	}
+	log.Printf("%#v (%T)\n", result, result)
+	fmt.Fprintf(w, "%v", result)
 }
