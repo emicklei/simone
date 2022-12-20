@@ -1,12 +1,12 @@
-package module
+package simone
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 
 	"github.com/dop251/goja"
-	"github.com/emicklei/simone"
 )
 
 type ActionHandler struct {
@@ -18,6 +18,7 @@ func NewActionHandler(cfg Config) *ActionHandler {
 	vm := goja.New()
 	space := NewObjectSpace()
 	for _, each := range cfg.Initializers {
+		log.Println("starting plugin", each.Namespace())
 		if err := each.Start(vm); err != nil {
 			log.Fatal(err)
 		}
@@ -29,12 +30,13 @@ func NewActionHandler(cfg Config) *ActionHandler {
 }
 
 func (h *ActionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ap := simone.NewActionParams(r)
+	ap := NewActionParams(r)
 	result, err := h.vm.RunString(ap.Source)
 	if err != nil {
+		log.Println("RunString failed:", err.Error())
 		fmt.Fprint(w, err.Error())
 		return
 	}
 	log.Printf("%#v (%T)\n", result, result)
-	fmt.Fprintf(w, "%v", result)
+	io.WriteString(w, Print(result.Export()))
 }

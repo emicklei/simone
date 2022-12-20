@@ -6,16 +6,24 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/emicklei/simone"
 	"github.com/peterh/liner"
 )
 
+const hist = ".simone"
+
 func main() {
 	line := liner.NewLiner()
 	line.SetCtrlCAborts(true)
 	client := new(http.Client)
+
+	if f, err := os.Open(hist); err == nil {
+		line.ReadHistory(f)
+		f.Close()
+	}
 
 	defer line.Close()
 	for {
@@ -36,12 +44,18 @@ func main() {
 		line.AppendHistory(entry)
 		v, err := RunString(client, entry)
 		if err != nil {
-			fmt.Printf("\043[1;33m%v\043[0m\n", err)
+			fmt.Printf("\033[1;31m%v\033[0m\n", err)
 		} else {
 			fmt.Printf("\033[1;33m%v\033[0m\n", v)
 		}
 	}
 exit:
+	if f, err := os.Create(hist); err != nil {
+		log.Print("Error writing history file: ", err)
+	} else {
+		line.WriteHistory(f)
+		f.Close()
+	}
 }
 func RunString(client *http.Client, entry string) (any, error) {
 	body := bytes.NewBufferString(entry)
