@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"reflect"
 
 	"github.com/dop251/goja"
 )
@@ -31,6 +32,7 @@ func NewActionHandler(cfg Config) *ActionHandler {
 		config: cfg,
 	}
 	vm.Set("_plugins", h.PluginInfo)
+	vm.Set("_variables", h.GlobalVariables)
 	if cfg.Setup != nil {
 		log.Println("custom setting up Javascript vm")
 		if err := cfg.Setup(vm); err != nil {
@@ -43,6 +45,24 @@ func NewActionHandler(cfg Config) *ActionHandler {
 func (h *ActionHandler) PluginInfo() (list []string) {
 	for _, each := range h.config.Plugins {
 		list = append(list, each.Namespace())
+	}
+	return
+}
+
+func (h *ActionHandler) GlobalVariables() (filtered []string) {
+	for _, each := range h.vm.GlobalObject().Keys() {
+		v := h.vm.Get(each)
+		vt := v.ExportType()
+		if vt.Kind() == reflect.Func {
+			continue
+		}
+		// https://stackoverflow.com/questions/7132848/how-to-get-the-reflect-type-of-an-interface
+		var plugin Plugin
+		pluginType := reflect.TypeOf(&plugin).Elem()
+		if vt.Implements(pluginType) {
+			continue
+		}
+		filtered = append(filtered, each)
 	}
 	return
 }

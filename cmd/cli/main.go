@@ -38,6 +38,9 @@ func main() {
 				goto exit
 			}
 			if entry == ":v" {
+				v, _ := RunString(client, "_variables()")
+				fmt.Printf("\033[1;33m%v\033[0m\n", v)
+				continue
 				continue
 			}
 			if entry == ":p" {
