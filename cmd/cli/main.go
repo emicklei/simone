@@ -40,6 +40,11 @@ func main() {
 			if entry == ":v" {
 				continue
 			}
+			if entry == ":p" {
+				v, _ := RunString(client, "_plugins()")
+				fmt.Printf("\033[1;33m%v\033[0m\n", v)
+				continue
+			}
 		}
 		line.AppendHistory(entry)
 		v, err := RunString(client, entry)

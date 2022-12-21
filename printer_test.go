@@ -15,7 +15,7 @@ func TestPrintNil(t *testing.T) {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 	}
 	s = Print("string")
-	if got, want := s, "'string'"; got != want {
+	if got, want := s, `"string"`; got != want {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 	}
 	type Range struct {
@@ -25,7 +25,7 @@ func TestPrintNil(t *testing.T) {
 	}
 	w := true
 	s = Print(&Range{-1, 1, &w})
-	if got, want := s, "{'Low':-1, 'High':1, 'Inclusive':true}"; got != want {
+	if got, want := s, `{"Low":-1,"High":1,"Inclusive":true}`; got != want {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 	}
 	RegisterPrinter(new(Range), RangePrinter)
