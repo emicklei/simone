@@ -15,12 +15,14 @@ type ActionParams struct {
 }
 
 func (p ActionParams) Inject(base *url.URL) {
+	vals := base.Query()
 	if p.Debug {
-		base.Query().Add("debug", "true")
+		vals.Add("debug", "true")
 	}
-	base.Query().Add("line", p.Line)
-	base.Query().Add("action", p.Action)
-	base.Query().Add("file", p.File)
+	vals.Add("line", p.Line)
+	vals.Add("action", p.Action)
+	vals.Add("file", p.File)
+	base.RawQuery = vals.Encode()
 }
 
 func NewActionParams(req *http.Request) ActionParams {

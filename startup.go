@@ -14,6 +14,10 @@ func Start(cfg Config) {
 		AllowedHeaders:   []string{"*"},
 		AllowCredentials: true,
 	})
+	// use the address that the vscode extension in using by default
+	if cfg.HttpAddr == "" {
+		cfg.HttpAddr = ":9119"
+	}
 	handler := NewActionHandler(cfg)
 	mux := http.NewServeMux()
 	mux.Handle("/v1", handler)
