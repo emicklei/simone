@@ -67,7 +67,7 @@ exit:
 }
 func RunString(client *http.Client, entry string) (any, error) {
 	body := bytes.NewBufferString(entry)
-	req, err := http.NewRequest(http.MethodPost, "http://localhost:9119/v1/statements", body)
+	req, err := http.NewRequest(http.MethodPost, "http://localhost:9119/v1", body)
 	if err != nil {
 		return nil, err
 	}

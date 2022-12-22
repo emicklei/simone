@@ -16,7 +16,7 @@ func Start(cfg Config) {
 	})
 	handler := NewActionHandler(cfg)
 	mux := http.NewServeMux()
-	mux.Handle("/v1/statements", handler)
-	log.Println("simone serving on localhost:" + cfg.HttpAddr)
+	mux.Handle("/v1", handler)
+	log.Println("simone serving on localhost" + cfg.HttpAddr)
 	panic(http.ListenAndServe(cfg.HttpAddr, cc.Handler(mux)))
 }

@@ -1,11 +1,13 @@
 package simone
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"reflect"
+	"strings"
 
 	"github.com/dop251/goja"
 )
@@ -68,14 +70,48 @@ func (h *ActionHandler) GlobalVariables() (filtered []string) {
 }
 
 func (h *ActionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ap := NewActionParams(r)
-	result, err := h.vm.RunString(ap.Source)
-	if err != nil {
-		log.Println("RunString failed:", err.Error())
+	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(w, err.Error())
+		io.WriteString(w, "POST expected got "+r.Method)
 		return
 	}
-	log.Printf("%#v (%T)\n", result, result)
-	io.WriteString(w, Print(result.Export()))
+	w.Header().Set("content-type", "application/json")
+
+	ap := NewActionParams(r)
+
+	switch ap.Action {
+	case "eval":
+		log.Println("eval", ap.Source)
+		result, err := h.vm.RunString(ap.Source)
+		if err != nil {
+			log.Println("RunString failed:", err.Error())
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprint(w, err.Error())
+			return
+		}
+		printed := Print(result.Export())
+		log.Println(printed)
+		io.WriteString(w, printed)
+	case "inspect":
+		log.Println("inspect", ap.Source)
+		type markdownHolder struct {
+			MarkdownString string
+		}
+		json.NewEncoder(w).Encode(markdownHolder{MarkdownString: h.MarkdownInspectionOf(ap.Source)})
+	default:
+		io.WriteString(w, "unknown action:"+ap.Action)
+	}
+}
+
+// https://stackoverflow.com/questions/67749752/how-to-apply-styling-and-html-tags-on-hover-message-with-vscode-api
+func (h *ActionHandler) MarkdownInspectionOf(token string) string {
+	val := h.vm.Get(token)
+	if val == nil {
+		return ""
+	}
+	gv := val.Export()
+	b := new(strings.Builder)
+	fmt.Fprintf(b, "*%T*\n\n", gv)
+	b.WriteString(Print(gv))
+	return b.String()
 }
