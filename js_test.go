@@ -8,13 +8,6 @@ import (
 
 type Foo struct{}
 
-func TestDNU(t *testing.T) {
-	vm := goja.New()
-	vm.Set("f", new(Foo))
-	v, err := vm.RunString("f.Bar()")
-	t.Log(v, err)
-}
-
 func TestProxy(t *testing.T) {
 	vm := goja.New()
 	obj := vm.NewObject()

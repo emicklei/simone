@@ -45,9 +45,9 @@ func (p PagingState) Err() error {
 type NextPageFunc[T any] func(input PagingState) ([]T, PagingState)
 
 type PageIterator[T any] struct {
-	State    PagingState
-	lastPage []T
-	nexter   NextPageFunc[T]
+	State  PagingState
+	nexter NextPageFunc[T]
+	cache  []T
 }
 
 // NewPagingIterator returns an iterator that uses a paging function get chunks of data.
@@ -58,23 +58,33 @@ func NewPagingIterator[T any](nexter NextPageFunc[T]) *PageIterator[T] {
 	}
 }
 
-// Map implements JS map function
-func (i *PageIterator[T]) Map(block func(each T) any) (list []any) {
+func (i *PageIterator[T]) ensureCached() {
+	if len(i.cache) > 0 {
+		return
+	}
+	// if cache is empty because of result then retry
 	for i.HasNextPage() {
 		for _, each := range i.NextPage() {
-			list = append(list, block(each))
+			i.cache = append(i.cache, each)
 		}
+	}
+}
+
+// Map implements JS map function
+func (i *PageIterator[T]) Map(block func(each T) any) (list []any) {
+	i.ensureCached()
+	for _, each := range i.cache {
+		list = append(list, block(each))
 	}
 	return
 }
 
 // Filter implements JS filter function
 func (i *PageIterator[T]) Filter(block func(each T) bool) (list []any) {
-	for i.HasNextPage() {
-		for _, each := range i.NextPage() {
-			if block(each) {
-				list = append(list, each)
-			}
+	i.ensureCached()
+	for _, each := range i.cache {
+		if block(each) {
+			list = append(list, each)
 		}
 	}
 	return
