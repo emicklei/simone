@@ -41,6 +41,7 @@ func (p PagingState) Err() error {
 	return p.nextPageError
 }
 
+// NextPageFunc fetches the next chunk of data (a page) and return the result with information about the next chunk (page).
 type NextPageFunc[T any] func(input PagingState) ([]T, PagingState)
 
 type PageIterator[T any] struct {
@@ -49,6 +50,7 @@ type PageIterator[T any] struct {
 	nexter   NextPageFunc[T]
 }
 
+// NewPagingIterator returns an iterator that uses a paging function get chunks of data.
 func NewPagingIterator[T any](nexter NextPageFunc[T]) *PageIterator[T] {
 	return &PageIterator[T]{
 		State:  PagingState{hasMorePages: true},
