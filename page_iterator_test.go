@@ -41,7 +41,33 @@ func TestIterateFilter(t *testing.T) {
 		t.Fatal(err)
 	}
 	gr := vm.Get("r").Export()
-	if got, want := gr, []int{2, 4}; reflect.DeepEqual(got, want) {
+	if got, want := gr, []int{2, 4}; !reflect.DeepEqual(got, want) {
+		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
+	}
+}
+
+func TestIterateGetIndex(t *testing.T) {
+	vm := goja.New()
+	vm.Set("l", createListProxy(vm))
+	_, err := vm.RunString(`r = l[3]`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	gr := vm.Get("r").Export()
+	if got, want := gr, 3; reflect.DeepEqual(got, want) {
+		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
+	}
+}
+
+func TestIterateLength(t *testing.T) {
+	vm := goja.New()
+	vm.Set("l", createListProxy(vm))
+	_, err := vm.RunString(`r = l.length`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	gr := vm.Get("r").Export()
+	if got, want := gr, 4; reflect.DeepEqual(got, want) {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 	}
 }

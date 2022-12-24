@@ -80,7 +80,7 @@ func (i *PageIterator[T]) Map(block func(each T) any) (list []any) {
 }
 
 // Filter implements JS filter function
-func (i *PageIterator[T]) Filter(block func(each T) bool) (list []any) {
+func (i *PageIterator[T]) Filter(block func(each T) bool) (list []T) {
 	i.ensureCached()
 	for _, each := range i.cache {
 		if block(each) {
@@ -88,6 +88,16 @@ func (i *PageIterator[T]) Filter(block func(each T) bool) (list []any) {
 		}
 	}
 	return
+}
+
+func (i *PageIterator[T]) GetIndex(idx int) T {
+	i.ensureCached()
+	return i.cache[idx]
+}
+
+func (i *PageIterator[T]) Len() int {
+	i.ensureCached()
+	return len(i.cache)
 }
 
 func (i *PageIterator[T]) NextPage() []T {
@@ -114,13 +124,15 @@ func (i *PageIterator[T]) ToProxy(vm *goja.Runtime) goja.Proxy {
 				return vm.ToValue(i.Map)
 			case "filter":
 				return vm.ToValue(i.Filter)
+			case "length":
+				return vm.ToValue(i.Len)
 			default:
 				log.Println("[simone.PageIterator] error: no such property:", property)
 				return goja.Null()
 			}
 		},
-		// GetIdx: func(target *goja.Object, property int, receiver goja.Value) (value goja.Value) {
-		// 	return s.vm.ToValue(1)
-		// },
+		GetIdx: func(target *goja.Object, property int, receiver goja.Value) (value goja.Value) {
+			return vm.ToValue(i.GetIndex(property))
+		},
 	})
 }

@@ -1,0 +1,4 @@
+- able to run simone scripts from command line (without starting http)
+- add include
+- refactor plugin interface; separate plugin from namespace name
+- add log
