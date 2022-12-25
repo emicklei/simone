@@ -8,7 +8,7 @@ import (
 
 type Plugin interface {
 	Namespace() string
-	Start(vm *goja.Runtime) error
+	Init(vm *goja.Runtime) error
 }
 
 type PrintFunc func(v any, b *strings.Builder)

@@ -22,9 +22,14 @@ func NewActionHandler(cfg Config) *ActionHandler {
 	vm := goja.New()
 	//vm.SetFieldNameMapper(goja.TagFieldNameMapper("json", true))
 	space := NewObjectSpace()
+
+	// install builtins before plugin initialization
+	InitBuiltins(vm)
 	for _, each := range cfg.Plugins {
-		log.Println("starting plugin", each.Namespace())
-		if err := each.Start(vm); err != nil {
+		ns := each.Namespace()
+		log.Println("init plugin", ns)
+		vm.Set(ns, each)
+		if err := each.Init(vm); err != nil {
 			log.Fatal(err)
 		}
 	}
@@ -35,9 +40,6 @@ func NewActionHandler(cfg Config) *ActionHandler {
 	}
 	vm.Set("_plugins", h.PluginInfo)
 	vm.Set("_variables", h.GlobalVariables)
-	vm.Set("log", func(arg ...any) {
-		log.Println(arg...)
-	})
 	if cfg.Setup != nil {
 		log.Println("custom setting up Javascript vm")
 		if err := cfg.Setup(vm); err != nil {
@@ -108,12 +110,20 @@ func (h *ActionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		// special printer
 		// TODO use EvalResult
 		val := result.Export()
-		printed := fmt.Sprintf("(%T) %s", val, Print(val))
+		printed := fmt.Sprintf("%s (%T)", Print(val), val)
 		log.Println(printed)
 		io.WriteString(w, printed)
 	default:
 		io.WriteString(w, "unknown or empty action:"+ap.Action)
 	}
+}
+
+func (h *ActionHandler) run(ap ActionParams) (string, error) {
+	result, err := h.vm.RunString(ap.Source)
+	if err != nil {
+		return "", err
+	}
+	return Print(result.Export()), nil
 }
 
 // https://stackoverflow.com/questions/67749752/how-to-apply-styling-and-html-tags-on-hover-message-with-vscode-api
