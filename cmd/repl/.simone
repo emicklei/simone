@@ -1,0 +1,10 @@
+1_2
+1+2
+fs.Dir()
+fs.Chdir('/tmp')
+fs.Dir()
+fs.Chdir('/tmp')
+fs.Chdir('/Users/emicklei/goProjects/github.com/emicklei/')
+fs.Dir()
+demo.Time()
+a=1

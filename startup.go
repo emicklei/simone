@@ -51,4 +51,5 @@ func Run(cfg Config) error {
 		return err
 	}
 	fmt.Println(output)
+	return nil
 }

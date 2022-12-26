@@ -1,4 +1,4 @@
-# simone - cli
+# simone - repl
 
 ## usage
 
