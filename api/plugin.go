@@ -1,4 +1,4 @@
-package simone
+package api
 
 import (
 	"strings"
@@ -12,5 +12,3 @@ type Plugin interface {
 }
 
 type PrintFunc func(v any, b *strings.Builder)
-
-type RuntimeSetupFunc func(vm *goja.Runtime) error

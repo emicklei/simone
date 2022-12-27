@@ -1,17 +1,19 @@
-package simone
+package core
 
 import (
 	"encoding/json"
 	"fmt"
 	"reflect"
 	"strings"
+
+	"github.com/emicklei/simone/api"
 )
 
 var printer = &Printer{
-	registry: map[reflect.Type]PrintFunc{},
+	registry: map[reflect.Type]api.PrintFunc{},
 }
 
-func RegisterPrinter(v any, p PrintFunc) {
+func RegisterPrinter(v any, p api.PrintFunc) {
 	rt := reflect.TypeOf(v)
 	if rt.Kind() == reflect.Pointer {
 		rt = rt.Elem()
@@ -20,7 +22,7 @@ func RegisterPrinter(v any, p PrintFunc) {
 }
 
 type Printer struct {
-	registry map[reflect.Type]PrintFunc
+	registry map[reflect.Type]api.PrintFunc
 }
 
 func Print(v any) string {

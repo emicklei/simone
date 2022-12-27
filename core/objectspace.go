@@ -1,4 +1,4 @@
-package simone
+package core
 
 import (
 	"github.com/dop251/goja"

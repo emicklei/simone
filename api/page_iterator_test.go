@@ -1,4 +1,4 @@
-package simone
+package api
 
 import (
 	"reflect"

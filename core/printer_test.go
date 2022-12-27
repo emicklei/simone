@@ -1,4 +1,4 @@
-package simone
+package core
 
 import (
 	"strings"

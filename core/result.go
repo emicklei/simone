@@ -1,4 +1,4 @@
-package simone
+package core
 
 type EvalResult struct {
 	Error    string `json:"error"`

@@ -8,3 +8,12 @@ fs.Chdir('/Users/emicklei/goProjects/github.com/emicklei/')
 fs.Dir()
 demo.Time()
 a=1
+d
+d.Error()
+d
+fs.Dir()
+demo.Time()
+d=scorn.Dataset(uuid('c3426d3c-c080-014a-0436-6849d37bbc36'))
+d.Slug
+repo='b344a191-8d0c-bd15-42de-669644dd1bfd'
+emp='329efe22-56e2-5e1b-97b7-a538d4f49d73'

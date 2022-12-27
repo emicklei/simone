@@ -9,7 +9,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/emicklei/simone"
+	"github.com/emicklei/simone/core"
 	"github.com/peterh/liner"
 )
 
@@ -71,7 +71,7 @@ func RunString(client *http.Client, entry string) (any, error) {
 	if err != nil {
 		return nil, err
 	}
-	ap := simone.ActionParams{
+	ap := core.ActionParams{
 		Debug:  true,
 		Line:   "1",
 		File:   "cli",

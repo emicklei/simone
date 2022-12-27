@@ -1,4 +1,4 @@
-package simone
+package core
 
 import (
 	"encoding/json"
@@ -10,15 +10,16 @@ import (
 	"strings"
 
 	"github.com/dop251/goja"
+	"github.com/emicklei/simone/api"
 )
 
 type ActionHandler struct {
 	vm     *goja.Runtime
 	space  *ObjectSpace
-	config Config
+	config api.Config
 }
 
-func NewActionHandler(cfg Config) *ActionHandler {
+func NewActionHandler(cfg api.Config) *ActionHandler {
 	vm := goja.New()
 	//vm.SetFieldNameMapper(goja.TagFieldNameMapper("json", true))
 	space := NewObjectSpace()
@@ -70,7 +71,7 @@ func (h *ActionHandler) GlobalVariables() (filtered []string) {
 			continue
 		}
 		// https://stackoverflow.com/questions/7132848/how-to-get-the-reflect-type-of-an-interface
-		var plugin Plugin
+		var plugin api.Plugin
 		pluginType := reflect.TypeOf(&plugin).Elem()
 		if vt.Implements(pluginType) {
 			continue
@@ -120,7 +121,7 @@ func (h *ActionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *ActionHandler) run(ap ActionParams) (string, error) {
+func (h *ActionHandler) Run(ap ActionParams) (string, error) {
 	result, err := h.vm.RunString(ap.Source)
 	if err != nil {
 		return "", err
