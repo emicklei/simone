@@ -25,6 +25,8 @@ func NewActionHandler(cfg Config) *ActionHandler {
 
 	// install builtins before plugin initialization
 	InitBuiltins(vm)
+
+	// init all plugins
 	for _, each := range cfg.Plugins {
 		ns := each.Namespace()
 		log.Println("init plugin", ns)
@@ -41,7 +43,7 @@ func NewActionHandler(cfg Config) *ActionHandler {
 	vm.Set("_plugins", h.PluginInfo)
 	vm.Set("_variables", h.GlobalVariables)
 	if cfg.Setup != nil {
-		log.Println("custom setting up Javascript vm")
+		log.Println("custom setting up Javascript virtual machine")
 		if err := cfg.Setup(vm); err != nil {
 			log.Fatal(err)
 		}

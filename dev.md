@@ -2,3 +2,4 @@
 - add include
 - refactor plugin interface; separate plugin from namespace name
 - add log
+- handle {} (*status.Error)
