@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -9,6 +10,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/emicklei/simone/api"
 	"github.com/emicklei/simone/core"
 	"github.com/peterh/liner"
 )
@@ -38,23 +40,22 @@ func main() {
 				goto exit
 			}
 			if entry == ":v" {
-				v, _ := RunString(client, "_variables()")
-				fmt.Printf("\033[1;33m%v\033[0m\n", v)
-				continue
+				res := RunString(client, "_variables()")
+				fmt.Printf("\033[1;33m%v\033[0m\n", res.Data)
 				continue
 			}
 			if entry == ":p" {
-				v, _ := RunString(client, "_plugins()")
-				fmt.Printf("\033[1;33m%v\033[0m\n", v)
+				res := RunString(client, "_plugins()")
+				fmt.Printf("\033[1;33m%v\033[0m\n", res.Data)
 				continue
 			}
 		}
 		line.AppendHistory(entry)
-		v, err := RunString(client, entry)
-		if err != nil {
-			fmt.Printf("\033[1;31m%v\033[0m\n", err)
+		res := RunString(client, entry)
+		if res.Error != "" {
+			fmt.Printf("\033[1;31m%v\033[0m\n", res.Error)
 		} else {
-			fmt.Printf("\033[1;33m%v\033[0m\n", v)
+			fmt.Printf("\033[1;33m%v\033[0m\n", res.Data)
 		}
 	}
 exit:
@@ -65,11 +66,13 @@ exit:
 		f.Close()
 	}
 }
-func RunString(client *http.Client, entry string) (any, error) {
+func RunString(client *http.Client, entry string) api.EvalResult {
 	body := bytes.NewBufferString(entry)
 	req, err := http.NewRequest(http.MethodPost, "http://localhost:9119/v1", body)
+	res := api.EvalResult{}
 	if err != nil {
-		return nil, err
+		res.Error = err.Error()
+		return res
 	}
 	ap := core.ActionParams{
 		Debug:  true,
@@ -80,12 +83,17 @@ func RunString(client *http.Client, entry string) (any, error) {
 	ap.Inject(req.URL)
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		res.Error = err.Error()
+		return res
 	}
 	defer resp.Body.Close()
 	result, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		res.Error = err.Error()
+		return res
 	}
-	return string(result), nil
+	if err := json.Unmarshal(result, &res); err != nil {
+		res.Error = err.Error()
+	}
+	return res
 }

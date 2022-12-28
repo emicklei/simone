@@ -82,43 +82,59 @@ func (h *ActionHandler) GlobalVariables() (filtered []string) {
 }
 
 func (h *ActionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if api.Debug {
+		log.Println(r.Method, r.URL.RequestURI())
+	}
 	if r.Method != http.MethodPost {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		io.WriteString(w, "POST expected got "+r.Method)
 		return
 	}
+	res := api.EvalResult{}
 	w.Header().Set("content-type", "application/json")
 
-	log.Println(r.URL.String())
-
 	ap := NewActionParams(r)
-
 	switch ap.Action {
 	case "hover":
-		// TODO use InspectResult
-		log.Println("inspect", ap.Source)
-		type markdownHolder struct {
-			MarkdownString string
+		ires := api.InspectResult{}
+		md, typ, err := h.MarkdownInspectionOf(ap.Source)
+		if err == nil {
+			ires.Datatype = typ
+			ires.Markdown = md
+		} else {
+			ires.Error = err.Error()
 		}
-		json.NewEncoder(w).Encode(markdownHolder{MarkdownString: h.MarkdownInspectionOf(ap.Source)})
+		json.NewEncoder(w).Encode(ires)
+		return
 	case "eval", "inspect":
-		log.Println("eval", ap.Source)
+		if api.Debug {
+			log.Println("eval", ap.Source)
+		}
 		result, err := h.vm.RunString(ap.Source)
 		if err != nil {
-			log.Println("RunString failed:", err.Error())
-			w.WriteHeader(http.StatusBadRequest)
-			fmt.Fprint(w, err.Error())
-			return
+			// syntax error
+			if api.Debug {
+				log.Println("RunString failed:", err.Error())
+			}
+			res.Error = err.Error()
+		} else {
+			val := result.Export()
+			if err, ok := val.(error); ok {
+				// evaluation error
+				res.Error = err.Error()
+			} else {
+				// no error
+				res.Data = Print(val)
+				res.Datatype = fmt.Sprintf("%T", val)
+			}
 		}
-		// special printer
-		// TODO use EvalResult
-		val := result.Export()
-		printed := fmt.Sprintf("%s (%T)", Print(val), val)
-		log.Println(printed)
-		io.WriteString(w, printed)
 	default:
-		io.WriteString(w, "unknown or empty action:"+ap.Action)
+		if api.Debug {
+			log.Println("unknown or empty action:", ap.Action)
+		}
+		res.Error = fmt.Sprintf("unknown or empty action:" + ap.Action)
 	}
+	json.NewEncoder(w).Encode(res)
 }
 
 func (h *ActionHandler) Run(ap ActionParams) (string, error) {
@@ -130,14 +146,11 @@ func (h *ActionHandler) Run(ap ActionParams) (string, error) {
 }
 
 // https://stackoverflow.com/questions/67749752/how-to-apply-styling-and-html-tags-on-hover-message-with-vscode-api
-func (h *ActionHandler) MarkdownInspectionOf(token string) string {
+func (h *ActionHandler) MarkdownInspectionOf(token string) (string, string, error) {
 	val := h.vm.Get(token)
 	if val == nil {
-		return ""
+		return "", "", nil
 	}
 	gv := val.Export()
-	b := new(strings.Builder)
-	fmt.Fprintf(b, "*%T*\n\n", gv)
-	b.WriteString(Print(gv))
-	return b.String()
+	return Print(gv), fmt.Sprintf("%T", gv), nil
 }

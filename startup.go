@@ -1,7 +1,7 @@
 package simone
 
 import (
-	"errors"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -14,15 +14,28 @@ import (
 
 var (
 	RegisterPrinter = core.RegisterPrinter
+	oDebug          = flag.Bool("v", false, "verbose logging")
+	oScript         = flag.String("s", "", "script filename")
 )
+
+func init() {
+	flag.Parse()
+	api.Debug = *oDebug
+	if api.Debug {
+		log.Println("verbose logging enabled")
+	}
+}
 
 // Go either starts a HTTP service or runs a script ; depending on whether a file was provided
 func Go(cfg api.Config) {
-	if len(os.Args) == 1 {
+	if *oScript == "" {
 		log.Println("no file provided so start an HTTP server")
 		Start(cfg)
 	} else {
-		Run(cfg)
+		cfg.Script = *oScript
+		if err := Run(cfg); err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
@@ -47,11 +60,11 @@ func Start(cfg api.Config) {
 
 // Run executes the script passed as as argument
 func Run(cfg api.Config) error {
-	handler := core.NewActionHandler(cfg)
-	if len(os.Args) == 1 {
-		return errors.New("missing script filename")
+	if *oScript != "" {
+		cfg.Script = *oScript
 	}
-	filename := os.Args[1]
+	handler := core.NewActionHandler(cfg)
+	filename := cfg.Script
 	data, err := os.ReadFile(filename)
 	if err != nil {
 		return err

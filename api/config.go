@@ -2,7 +2,11 @@ package api
 
 import "github.com/dop251/goja"
 
+var Debug = false
+
 type Config struct {
+	// Optional for initialization
+	Script string
 	// Required for CORS
 	Origin string
 	// Optional when running as a service

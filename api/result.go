@@ -1,4 +1,4 @@
-package core
+package api
 
 type EvalResult struct {
 	Error    string `json:"error"`
@@ -8,6 +8,6 @@ type EvalResult struct {
 
 type InspectResult struct {
 	Error    string `json:"error"`
-	Markdown string `json:"data"`
+	Markdown string `json:"markdown"`
 	Datatype string `json:"datatype"`
 }
