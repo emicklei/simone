@@ -2,9 +2,9 @@ module repl
 
 go 1.19
 
-replace github.com/emicklei/simone => ../../.
+// replace github.com/emicklei/simone => ../../.
 require (
-	github.com/emicklei/simone v0.3.2
+	github.com/emicklei/simone v0.4.0
 	github.com/peterh/liner v1.2.2
 )
 
