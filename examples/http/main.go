@@ -11,5 +11,5 @@ func main() {
 		HttpAddr: ":9119",
 		Plugins:  []api.Plugin{new(Demo), new(fs.Plugin)},
 	}
-	simone.Start(cfg)
+	simone.Go(cfg)
 }

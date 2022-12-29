@@ -43,6 +43,8 @@ func NewActionHandler(cfg api.Config) *ActionHandler {
 	}
 	vm.Set("_plugins", h.PluginInfo)
 	vm.Set("_variables", h.GlobalVariables)
+	vm.Set("_toggledebug", h.ToggleDebug)
+	vm.Set("_showhelp", h.ShowHelp)
 	if cfg.Setup != nil {
 		log.Println("custom setting up Javascript virtual machine")
 		if err := cfg.Setup(vm); err != nil {
@@ -50,6 +52,20 @@ func NewActionHandler(cfg api.Config) *ActionHandler {
 		}
 	}
 	return h
+}
+
+func (h *ActionHandler) ShowHelp() {
+	log.Println("no help yet")
+}
+
+func (h *ActionHandler) ToggleDebug() {
+	if api.Debug {
+		api.Debug = false
+		log.Println("verbose log disabled")
+	} else {
+		api.Debug = true
+		log.Println("verbose log enabled")
+	}
 }
 
 func (h *ActionHandler) PluginInfo() (list []string) {

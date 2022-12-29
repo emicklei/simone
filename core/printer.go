@@ -35,7 +35,16 @@ func Print(v any) string {
 var pluginType = reflect.TypeOf((*api.Plugin)(nil)).Elem()
 
 func printSliceOn(v any, rt reflect.Type, b *strings.Builder) {
-	printDefaultOn(v, b)
+	rv := reflect.ValueOf(v)
+	b.WriteRune('[')
+	for i := 0; i < rv.Len(); i++ {
+		if i > 0 {
+			b.WriteString(", ")
+		}
+		each := rv.Index(i)
+		printOn(each.Interface(), b)
+	}
+	b.WriteRune(']')
 }
 
 func printDefaultOn(v any, b *strings.Builder) {

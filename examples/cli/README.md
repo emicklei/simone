@@ -1,3 +1,3 @@
 ## cli
 
-    go run main.go demo.sim
+    go run main.go -s demo.sim

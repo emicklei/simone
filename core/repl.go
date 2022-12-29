@@ -31,7 +31,7 @@ func (a *ActionCommander) Loop() {
 		f.Close()
 	}
 
-	fmt.Printf("\033[1;32m%s\033[0m\n", ":q (quit) :p (plugins) :v (variables)")
+	fmt.Printf("\033[1;32m%s\033[0m\n", ":q (quit) :h (help) :p (plugins) :v (variables) :d (verbose)")
 
 	defer line.Close()
 	for {
@@ -53,6 +53,14 @@ func (a *ActionCommander) Loop() {
 			if entry == ":p" {
 				res := a.RunString("_plugins()")
 				fmt.Printf("\033[1;33m%v\033[0m\n", res.Data)
+				continue
+			}
+			if entry == ":d" {
+				a.RunString("_toggledebug()")
+				continue
+			}
+			if entry == ":h" {
+				a.RunString("_showhelp()")
 				continue
 			}
 		}

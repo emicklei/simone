@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestPrintNil(t *testing.T) {
+func TestPrint(t *testing.T) {
 	s := Print(nil)
 	if got, want := s, "null"; got != want {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
@@ -28,10 +28,19 @@ func TestPrintNil(t *testing.T) {
 	if got, want := s, `{"Low":-1, "High":1, "Inclusive":true}`; got != want {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 	}
+	// changes a global
 	RegisterPrinter(new(Range), RangePrinter)
 	s = Print(&Range{-1, 1, &w})
 	if got, want := s, "rangeprinted"; got != want {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
+	}
+	list := []*Range{
+		{-1, 1, &w},
+		{-2, 2, &w},
+	}
+	slist := Print(list)
+	if got, want := slist, "[rangeprinted, rangeprinted]"; got != want {
+		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }
 

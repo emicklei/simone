@@ -57,7 +57,7 @@ func Start(cfg api.Config) {
 		cfg.HttpAddr = ":9119"
 	}
 	handler := core.NewActionHandler(cfg)
-	log.Println("simone serving on localhost" + cfg.HttpAddr)
+	log.Println("simone is serving on localhost" + cfg.HttpAddr)
 	go func() {
 		mux := http.NewServeMux()
 		mux.Handle("/v1", handler)
