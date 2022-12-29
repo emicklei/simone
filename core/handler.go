@@ -134,6 +134,9 @@ func (h *ActionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		res.Error = fmt.Sprintf("unknown or empty action:" + ap.Action)
 	}
+	if res.Error != "" {
+		log.Println("error:", res.Error)
+	}
 	json.NewEncoder(w).Encode(res)
 }
 
