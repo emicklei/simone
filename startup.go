@@ -18,7 +18,10 @@ var (
 	oScript         = flag.String("s", "", "script filename")
 )
 
-func init() {
+func ensureFlags() {
+	if flag.Parsed() {
+		return
+	}
 	flag.Parse()
 	api.Debug = *oDebug
 	if api.Debug {
@@ -28,6 +31,7 @@ func init() {
 
 // Go either starts a HTTP service or runs a script ; depending on whether a file was provided
 func Go(cfg api.Config) {
+	ensureFlags()
 	if *oScript == "" {
 		log.Println("no file provided so start an HTTP server")
 		Start(cfg)
@@ -41,6 +45,7 @@ func Go(cfg api.Config) {
 
 // Start listens for actions on a HTTP endpoint.
 func Start(cfg api.Config) {
+	ensureFlags()
 	cc := cors.New(cors.Options{
 		AllowedOrigins:   []string{cfg.Origin},
 		AllowedMethods:   []string{http.MethodGet, http.MethodPost},
@@ -60,6 +65,7 @@ func Start(cfg api.Config) {
 
 // Run executes the script passed as as argument
 func Run(cfg api.Config) error {
+	ensureFlags()
 	if *oScript != "" {
 		cfg.Script = *oScript
 	}

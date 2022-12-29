@@ -128,6 +128,7 @@ func printMethod(b *strings.Builder, met reflect.Method) {
 
 func printStruct(b *strings.Builder, rt reflect.Type, rv reflect.Value) {
 	if !rv.IsValid() {
+		b.WriteString("null")
 		return
 	}
 	b.WriteRune('{')
