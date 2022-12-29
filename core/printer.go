@@ -34,6 +34,16 @@ func Print(v any) string {
 // assume plugin is pointer type
 var pluginType = reflect.TypeOf((*api.Plugin)(nil)).Elem()
 
+func printSliceOn(v any, rt reflect.Type, b *strings.Builder) {
+	printDefaultOn(v, b)
+}
+
+func printDefaultOn(v any, b *strings.Builder) {
+	// fallback to standard JSON encoder
+	data, _ := json.Marshal(v)
+	b.WriteString(string(data))
+}
+
 func printOn(v any, b *strings.Builder) {
 	if v == nil {
 		b.WriteString("null")
@@ -41,6 +51,10 @@ func printOn(v any, b *strings.Builder) {
 	}
 	// check for struct
 	rt := reflect.TypeOf(v)
+	if rt.Kind() == reflect.Slice {
+		printSliceOn(v, rt, b)
+		return
+	}
 	rv := reflect.ValueOf(v)
 	if rt.Kind() == reflect.Pointer {
 		rt = rt.Elem()
@@ -60,12 +74,11 @@ func printOn(v any, b *strings.Builder) {
 		return
 	}
 	// fallback to standard JSON encoder
-	data, _ := json.Marshal(v)
-	b.WriteString(string(data))
+	printDefaultOn(v, b)
 }
 
 func printPlugin(b *strings.Builder, rt reflect.Type) {
-	fmt.Fprintf(b, "plugin %s.%s [\n", rt.Elem().PkgPath(), rt.Elem().Name()) // assume plugin is pointer
+	fmt.Fprintf(b, "%s.%s [\n", rt.Elem().PkgPath(), rt.Elem().Name()) // assume plugin is pointer
 	for m := 0; m < rt.NumMethod(); m++ {
 		met := rt.Method(m)
 		if met.IsExported() {
@@ -77,7 +90,7 @@ func printPlugin(b *strings.Builder, rt reflect.Type) {
 			fmt.Fprintln(b)
 		}
 	}
-	fmt.Fprintf(b, "]\n")
+	fmt.Fprintf(b, "]")
 }
 
 func printMethod(b *strings.Builder, met reflect.Method) {
