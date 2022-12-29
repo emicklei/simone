@@ -1,4 +1,4 @@
-module repl
+module github.com/emicklei/simone/cmd/repl
 
 go 1.19
 
