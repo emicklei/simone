@@ -57,10 +57,14 @@ func Start(cfg api.Config) {
 		cfg.HttpAddr = ":9119"
 	}
 	handler := core.NewActionHandler(cfg)
-	mux := http.NewServeMux()
-	mux.Handle("/v1", handler)
 	log.Println("simone serving on localhost" + cfg.HttpAddr)
-	panic(http.ListenAndServe(cfg.HttpAddr, cc.Handler(mux)))
+	go func() {
+		mux := http.NewServeMux()
+		mux.Handle("/v1", handler)
+		panic(http.ListenAndServe(cfg.HttpAddr, cc.Handler(mux)))
+	}()
+	cmd := core.NewActionCommander(handler)
+	cmd.Loop()
 }
 
 // Run executes the script passed as as argument
