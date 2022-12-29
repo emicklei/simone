@@ -138,9 +138,9 @@ func printStruct(b *strings.Builder, rt reflect.Type, rv reflect.Value) {
 			if comma {
 				b.WriteString(", ")
 			}
-			b.WriteRune('\'')
+			b.WriteRune('"')
 			fmt.Fprintf(b, f.Name)
-			b.WriteRune('\'')
+			b.WriteRune('"')
 			fv := rv.Field(i)
 			b.WriteRune(':')
 			if fv.CanInterface() {
