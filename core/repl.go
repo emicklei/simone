@@ -11,12 +11,12 @@ import (
 )
 
 type ActionCommander struct {
-	handler *ActionHandler
+	runner Runnable
 }
 
-func NewActionCommander(h *ActionHandler) *ActionCommander {
+func NewActionCommander(r Runnable) *ActionCommander {
 	return &ActionCommander{
-		handler: h,
+		runner: r,
 	}
 }
 
@@ -31,7 +31,7 @@ func (a *ActionCommander) Loop() {
 		f.Close()
 	}
 
-	fmt.Printf("\033[1;32m%s\033[0m\n", ":q (quit) :h (help) :p (plugins) :v (variables) :d (verbose)")
+	fmt.Printf("\033[1;32m%s\033[0m\n", ":q (quit) :h (help) :v (variables) :p (plugins) :d (verbose)")
 
 	defer line.Close()
 	for {
@@ -41,18 +41,18 @@ func (a *ActionCommander) Loop() {
 			goto exit
 		}
 		if strings.HasPrefix(entry, ":") {
-			// special case
+			// special cases
 			if entry == ":q" || entry == ":Q" {
 				goto exit
 			}
 			if entry == ":v" {
 				res := a.RunString("_variables()")
-				fmt.Printf("\033[1;33m%v\033[0m\n", res.Data)
+				output(res.Data, true)
 				continue
 			}
 			if entry == ":p" {
 				res := a.RunString("_plugins()")
-				fmt.Printf("\033[1;33m%v\033[0m\n", res.Data)
+				output(res.Data, true)
 				continue
 			}
 			if entry == ":d" {
@@ -60,16 +60,24 @@ func (a *ActionCommander) Loop() {
 				continue
 			}
 			if entry == ":h" {
-				a.RunString("_showhelp()")
+				res := a.RunString("_showhelp()")
+				output(res.Data, true)
 				continue
 			}
+		}
+		// ? = what can this value do
+		if strings.HasSuffix(entry, "?") {
+			src := fmt.Sprintf("_methods(%s)", entry[0:len(entry)-1])
+			res := a.RunString(src)
+			output(res.Data, true)
+			continue
 		}
 		line.AppendHistory(entry)
 		res := a.RunString(entry)
 		if res.Error != "" {
-			fmt.Printf("\033[1;31m%v\033[0m\n", res.Error)
+			output(res.Error, false)
 		} else {
-			fmt.Printf("\033[1;33m%v\033[0m\n", res.Data)
+			output(res.Data, true)
 		}
 	}
 exit:
@@ -82,23 +90,14 @@ exit:
 	}
 }
 
-func (a *ActionCommander) RunString(entry string) api.EvalResult {
-	// TODO dedup code
-	res := api.EvalResult{}
-	result, err := a.handler.vm.RunString(entry)
-	if err != nil {
-		// syntax error
-		res.Error = err.Error()
+func output(v any, ok bool) {
+	if !ok {
+		fmt.Printf("\033[1;31m%v\033[0m\n", v)
 	} else {
-		val := result.Export()
-		if err, ok := val.(error); ok {
-			// evaluation error
-			res.Error = err.Error()
-		} else {
-			// no error
-			res.Data = Print(val)
-			res.Datatype = fmt.Sprintf("%T", val)
-		}
+		fmt.Printf("\033[1;33m%v\033[0m\n", v)
 	}
-	return res
+}
+
+func (a *ActionCommander) RunString(entry string) api.EvalResult {
+	return a.runner.RunString(entry)
 }

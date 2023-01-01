@@ -1,6 +1,7 @@
 package simone
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -14,38 +15,56 @@ import (
 
 var (
 	RegisterPrinter = core.RegisterPrinter
-	oDebug          = flag.Bool("v", false, "verbose logging")
-	oScript         = flag.String("s", "", "script filename")
+	// start options
+	oDebug         = flag.Bool("v", false, "verbose logging")
+	oStartupScript = flag.String("s", "", "run script from filename on startup")
+	oRunScript     = flag.String("i", "", "run the script from filename as input")
+	oClient        = flag.Bool("c", false, "start a client REPL")
+	oHelp          = flag.Bool("h", false, "show help")
 )
 
-func ensureFlags() {
-	if flag.Parsed() {
+// Start runs the application is one of the modes:
+// - local evaluate a script from file
+// - http service + REPL
+// - http client + REPL
+func Start(cfg api.Config) {
+	flag.Parse()
+	if *oHelp {
+		flag.PrintDefaults()
 		return
 	}
-	flag.Parse()
-	api.Debug = *oDebug
-	if api.Debug {
-		log.Println("verbose logging enabled")
-	}
-}
 
-// Go either starts a HTTP service or runs a script ; depending on whether a file was provided
-func Go(cfg api.Config) {
-	ensureFlags()
-	if *oScript == "" {
-		log.Println("no file provided so start an HTTP server")
-		Start(cfg)
-	} else {
-		cfg.Script = *oScript
-		if err := Run(cfg); err != nil {
-			log.Fatal(err)
+	// run script only
+	if inputFilename := *oRunScript; inputFilename != "" {
+		r := core.NewLocalRunner(cfg)
+		res := r.Include(inputFilename)
+		if res.Error != "" {
+			json.NewEncoder(os.Stdout).Encode(res)
+		} else {
+			fmt.Println(res.Data)
 		}
+		return
 	}
+
+	// run client with repl
+	if *oClient {
+		r := core.NewRemoteRunner()
+		log.Println("talking to simone on localhost" + cfg.HttpAddr)
+		startREPL(r)
+		return
+	}
+
+	// run service with repl
+	r := core.NewLocalRunner(cfg)
+	if initFilename := *oStartupScript; initFilename != "" {
+		r.Include(initFilename)
+	}
+	go startHTTP(cfg, r)
+	startREPL(r)
 }
 
-// Start listens for actions on a HTTP endpoint.
-func Start(cfg api.Config) {
-	ensureFlags()
+// startHTTP is blocking
+func startHTTP(cfg api.Config, r core.Runnable) {
 	cc := cors.New(cors.Options{
 		AllowedOrigins:   []string{cfg.Origin},
 		AllowedMethods:   []string{http.MethodGet, http.MethodPost},
@@ -56,39 +75,15 @@ func Start(cfg api.Config) {
 	if cfg.HttpAddr == "" {
 		cfg.HttpAddr = ":9119"
 	}
-	handler := core.NewActionHandler(cfg)
+	handler := core.NewActionHandler(r)
 	log.Println("simone is serving on localhost" + cfg.HttpAddr)
-	go func() {
-		mux := http.NewServeMux()
-		mux.Handle("/v1", handler)
-		panic(http.ListenAndServe(cfg.HttpAddr, cc.Handler(mux)))
-	}()
-	cmd := core.NewActionCommander(handler)
-	cmd.Loop()
+	mux := http.NewServeMux()
+	mux.Handle("/v1", handler)
+	panic(http.ListenAndServe(cfg.HttpAddr, cc.Handler(mux)))
 }
 
-// Run executes the script passed as as argument
-func Run(cfg api.Config) error {
-	ensureFlags()
-	if *oScript != "" {
-		cfg.Script = *oScript
-	}
-	handler := core.NewActionHandler(cfg)
-	filename := cfg.Script
-	data, err := os.ReadFile(filename)
-	if err != nil {
-		return err
-	}
-	ap := core.ActionParams{
-		Debug:  false,
-		Action: "eval",
-		File:   filename,
-		Source: string(data),
-	}
-	output, err := handler.Run(ap)
-	if err != nil {
-		return err
-	}
-	fmt.Println(output)
-	return nil
+// startREPL is blocking
+func startREPL(r core.Runnable) {
+	cmd := core.NewActionCommander(r)
+	cmd.Loop()
 }

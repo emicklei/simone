@@ -3,11 +3,14 @@ package core
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"reflect"
 	"strings"
 
 	"github.com/emicklei/simone/api"
 )
+
+type PlainText string
 
 var printer = &Printer{
 	registry: map[reflect.Type]api.PrintFunc{},
@@ -58,6 +61,11 @@ func printOn(v any, b *strings.Builder) {
 		b.WriteString("null")
 		return
 	}
+	// PlainText is to communicate non-JSON object results
+	if p, ok := v.(PlainText); ok {
+		io.WriteString(b, string(p))
+		return
+	}
 	// check for struct
 	rt := reflect.TypeOf(v)
 	if rt.Kind() == reflect.Slice {
@@ -74,11 +82,6 @@ func printOn(v any, b *strings.Builder) {
 			pf(v, b)
 			return
 		}
-		// check for plugin
-		if reflect.TypeOf(v).Implements(pluginType) {
-			printPlugin(b, reflect.TypeOf(v))
-			return
-		}
 		printStruct(b, rt, rv)
 		return
 	}
@@ -86,8 +89,11 @@ func printOn(v any, b *strings.Builder) {
 	printDefaultOn(v, b)
 }
 
-func printPlugin(b *strings.Builder, rt reflect.Type) {
-	fmt.Fprintf(b, "%s.%s [\n", rt.Elem().PkgPath(), rt.Elem().Name()) // assume plugin is pointer
+func printMethods(b *strings.Builder, rt reflect.Type) {
+	if rt.Kind() == reflect.Pointer {
+		rt = rt.Elem()
+	}
+	fmt.Fprintf(b, "%s.%s [\n", rt.PkgPath(), rt.Name())
 	for m := 0; m < rt.NumMethod(); m++ {
 		met := rt.Method(m)
 		if met.IsExported() {
