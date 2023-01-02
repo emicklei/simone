@@ -90,10 +90,11 @@ func printOn(v any, b *strings.Builder) {
 }
 
 func printMethods(b *strings.Builder, rt reflect.Type) {
+	it := rt
 	if rt.Kind() == reflect.Pointer {
-		rt = rt.Elem()
+		it = rt.Elem()
 	}
-	fmt.Fprintf(b, "%s.%s [\n", rt.PkgPath(), rt.Name())
+	fmt.Fprintf(b, "%s.%s [\n", it.PkgPath(), it.Name())
 	for m := 0; m < rt.NumMethod(); m++ {
 		met := rt.Method(m)
 		if met.IsExported() {
