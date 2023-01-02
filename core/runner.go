@@ -115,6 +115,7 @@ func (r *LocalRunner) initInternals() {
 	r.vm.Set("_toggledebug", r.toggleDebug)
 	r.vm.Set("_showhelp", r.showHelp)
 	r.vm.Set("_methods", r.showMethods)
+	r.vm.Set("_markdowninspect", r.markdownInspect)
 }
 
 func (r *LocalRunner) showMethods(v any) PlainText {
@@ -178,4 +179,8 @@ func (r *LocalRunner) Include(path string) api.EvalResult {
 		}
 	}
 	return r.RunString(string(data))
+}
+
+func (r *LocalRunner) markdownInspect(v any) any {
+	return PlainText(Print(v))
 }

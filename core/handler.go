@@ -36,13 +36,15 @@ func (h *ActionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ap := NewActionParams(r)
 	switch ap.Action {
 	case "hover":
-		ires := api.InspectResult{}
-		md, typ, err := h.MarkdownInspectionOf(ap.Source)
-		if err == nil {
-			ires.Datatype = typ
-			ires.Markdown = md
-		} else {
-			ires.Error = err.Error()
+		if api.Debug {
+			log.Println("hover", ap.Source)
+		}
+		// https://stackoverflow.com/questions/67749752/how-to-apply-styling-and-html-tags-on-hover-message-with-vscode-api
+		res = h.runner.RunString(fmt.Sprintf("_markdowninspect(%s)", ap.Source))
+		ires := api.InspectResult{
+			Error:    res.Error,
+			Markdown: res.Data,
+			Datatype: res.Datatype,
 		}
 		json.NewEncoder(w).Encode(ires)
 		return
@@ -61,15 +63,4 @@ func (h *ActionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		log.Println("error:", res.Error)
 	}
 	json.NewEncoder(w).Encode(res)
-}
-
-// https://stackoverflow.com/questions/67749752/how-to-apply-styling-and-html-tags-on-hover-message-with-vscode-api
-func (h *ActionHandler) MarkdownInspectionOf(token string) (string, string, error) {
-	// val := h.vm.Get(token)
-	// if val == nil {
-	// 	return "", "", nil
-	// }
-	// gv := val.Export()
-	// return Print(gv), fmt.Sprintf("%T", gv), nil
-	return "TODO", "TODO", nil
 }
