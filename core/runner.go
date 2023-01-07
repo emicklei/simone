@@ -6,10 +6,14 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
+	"os/exec"
 	"reflect"
+	"runtime"
 	"strings"
+	"time"
 
 	"github.com/dop251/goja"
 	"github.com/emicklei/simone/api"
@@ -86,6 +90,7 @@ func NewLocalRunner(cfg api.Config) *LocalRunner {
 			log.Fatal(err)
 		}
 	}
+	rand.Seed(time.Now().UnixNano())
 	return local
 }
 
@@ -102,6 +107,7 @@ func (r *LocalRunner) RunString(entry string) api.EvalResult {
 			res.Error = err.Error()
 		} else {
 			// no error
+			res.RawData = val
 			res.Data = Print(val)
 			res.Datatype = fmt.Sprintf("%T", val)
 		}
@@ -115,7 +121,29 @@ func (r *LocalRunner) initInternals() {
 	r.vm.Set("_toggledebug", r.toggleDebug)
 	r.vm.Set("_showhelp", r.showHelp)
 	r.vm.Set("_methods", r.showMethods)
+	r.vm.Set("_browse", r.browseObject)
 	r.vm.Set("_markdowninspect", r.markdownInspect)
+}
+
+func (r *LocalRunner) browseObject(v any) any {
+	if v == nil {
+		return ""
+	}
+	// store value in temporary variable
+	key := randSeq(10)
+	r.vm.Set(key, v)
+	open(fmt.Sprintf("http://localhost:9119/v1?action=browse&source=" + key))
+	return nil
+}
+
+var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+func randSeq(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
 }
 
 func (r *LocalRunner) showMethods(v any) PlainText {
@@ -183,4 +211,20 @@ func (r *LocalRunner) Include(path string) api.EvalResult {
 
 func (r *LocalRunner) markdownInspect(v any) any {
 	return PlainText(Print(v))
+}
+
+// Open calls the OS default program for uri
+func open(uri string) error {
+	var run string
+	switch {
+	case "windows" == runtime.GOOS:
+		run = "start"
+	case "darwin" == runtime.GOOS:
+		run = "open"
+	case "linux" == runtime.GOOS:
+		run = "xdg-open"
+	default:
+		return fmt.Errorf("Unable to open uri:%v on:%v", uri, runtime.GOOS)
+	}
+	return exec.Command(run, uri).Start()
 }

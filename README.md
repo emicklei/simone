@@ -22,6 +22,7 @@ See `examples` for a minimal program.
 | plugin | description
 |-|-
 | fs | access to the local filesystem
+
 ## builtin functions
 
     log(arg,arg,...);    // write log line
@@ -40,5 +41,11 @@ Commands start with the colon `:` prefix.
 |:p| show list of available plugin names
 
 If you postfix a variable (or plugin) with a `?` then it will print all available functions.
+If you postfix an entry with a `!` then it browse the result in a Web page.
 
 ## usage HTTP
+
+    POST | GET http://localhost:9119/v1?action=<ACTION>&source=<ENTRY>&file=<FILE>&line=<LINE>
+
+For POST the source is transported with the request body
+For GET the source can be passed as a query parameter.

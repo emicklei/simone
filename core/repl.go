@@ -72,6 +72,13 @@ func (a *ActionCommander) Loop() {
 			output(res.Data, true)
 			continue
 		}
+		// ! = open browser on object
+		if strings.HasSuffix(entry, "!") {
+			src := fmt.Sprintf("_browse(%s)", entry[0:len(entry)-1])
+			res := a.RunString(src)
+			output(res.Data, true)
+			continue
+		}
 		line.AppendHistory(entry)
 		res := a.RunString(entry)
 		if res.Error != "" {

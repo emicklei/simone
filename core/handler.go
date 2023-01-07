@@ -21,18 +21,42 @@ func NewActionHandler(r Runnable) *ActionHandler {
 	}
 }
 
+func (h *ActionHandler) handleGet(w http.ResponseWriter, r *http.Request) {
+	ap := NewActionParams(r)
+	switch ap.Action {
+	case "browse":
+		if api.Debug {
+			log.Println("browse", ap.Source)
+		}
+		res := h.runner.RunString(ap.Source)
+		if res.Error != "" {
+			json.NewEncoder(w).Encode(res)
+			return
+		}
+		if err := json.NewEncoder(w).Encode(res.RawData); err != nil {
+			log.Println("raw data encoding failed", err)
+			io.WriteString(w, err.Error())
+		}
+		return
+	}
+	w.WriteHeader(http.StatusNotFound)
+}
+
 func (h *ActionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
 	if api.Debug {
 		log.Println(r.Method, r.URL.RequestURI())
 	}
+	if r.Method == http.MethodGet {
+		h.handleGet(w, r)
+		return
+	}
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
-		io.WriteString(w, "POST expected got "+r.Method)
+		io.WriteString(w, "POST,GET expected got "+r.Method)
 		return
 	}
 	res := api.EvalResult{}
-	w.Header().Set("content-type", "application/json")
-
 	ap := NewActionParams(r)
 	switch ap.Action {
 	case "hover":

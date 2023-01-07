@@ -31,6 +31,10 @@ func NewActionParams(req *http.Request) ActionParams {
 	if err == nil {
 		defer req.Body.Close()
 	}
+	if len(body) == 0 {
+		// try get it from the query parameter
+		body = []byte(base.Query().Get("source"))
+	}
 	return ActionParams{
 		Debug:  base.Query().Get("debug") == "true",
 		Line:   base.Query().Get("line"),
