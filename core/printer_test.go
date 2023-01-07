@@ -5,6 +5,12 @@ import (
 	"testing"
 )
 
+type Range struct {
+	Low       int
+	High      int
+	Inclusive *bool
+}
+
 func TestPrint(t *testing.T) {
 	s := Print(nil)
 	if got, want := s, "null"; got != want {
@@ -18,11 +24,7 @@ func TestPrint(t *testing.T) {
 	if got, want := s, `"string"`; got != want {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 	}
-	type Range struct {
-		Low       int
-		High      int
-		Inclusive *bool
-	}
+
 	w := true
 	s = Print(&Range{-1, 1, &w})
 	if got, want := s, `{"Low":-1, "High":1, "Inclusive":true}`; got != want {

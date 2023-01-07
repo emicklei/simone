@@ -1,6 +1,11 @@
 package api
 
-import "github.com/dop251/goja"
+import (
+	"fmt"
+	"strings"
+
+	"github.com/dop251/goja"
+)
 
 var Debug = false
 
@@ -19,3 +24,11 @@ type Config struct {
 
 // RuntimeSetupFunc is the signature of the Setup callback.
 type RuntimeSetupFunc func(vm *goja.Runtime) error
+
+// HostPort returns host:port
+func (c Config) HostPort() string {
+	if strings.HasPrefix(c.HttpAddr, ":") {
+		return fmt.Sprintf("localhost%s", c.HttpAddr)
+	}
+	return c.HttpAddr
+}

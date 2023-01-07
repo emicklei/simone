@@ -129,10 +129,10 @@ func (r *LocalRunner) browseObject(v any) any {
 	if v == nil {
 		return ""
 	}
-	// store value in temporary variable
-	key := randSeq(10)
+	// store value in temporary variable TODO cleanup?
+	key := "_" + randSeq(10) // make it internal such that :v will not show it
 	r.vm.Set(key, v)
-	open(fmt.Sprintf("http://localhost:9119/v1?action=browse&source=" + key))
+	open(fmt.Sprintf("http://%s/v1?action=browse&source=%s", r.config.HostPort(), key))
 	return nil
 }
 
@@ -210,7 +210,7 @@ func (r *LocalRunner) Include(path string) api.EvalResult {
 }
 
 func (r *LocalRunner) markdownInspect(v any) any {
-	return PlainText(Print(v))
+	return PlainText(PrintMarkdown(v))
 }
 
 // Open calls the OS default program for uri
