@@ -2,8 +2,12 @@ package core
 
 import (
 	"fmt"
+	"log"
 	"reflect"
+	"sort"
 	"strings"
+
+	"github.com/emicklei/simone/api"
 )
 
 func PrintMarkdown(v any) string {
@@ -31,7 +35,14 @@ func printMarkdownOn(v any, b *strings.Builder) {
 		printStructMarkdown(b, rt, rv)
 		return
 	}
+	if rt.Kind() == reflect.Map {
+		printMapMarkdown(b, rt, rv)
+		return
+	}
 	// fallback to standard JSON encoder
+	if api.Debug {
+		log.Println("markdown fallback JSON")
+	}
 	printDefaultOn(v, b)
 }
 
@@ -56,25 +67,48 @@ func printSliceMarkdownOn(anyValue reflect.Value, sliceType reflect.Type, b *str
 }
 
 func printStructMarkdown(b *strings.Builder, rt reflect.Type, rv reflect.Value) {
+	b.WriteString(rt.PkgPath())
+	b.WriteRune('/')
+	b.WriteString(rt.Name())
+	b.WriteString("\n\n")
 	if !rv.IsValid() {
 		b.WriteString("null")
 		return
 	}
-	comma := false
+	kvs := []kv{}
 	for i := 0; i < rt.NumField(); i++ {
 		f := rt.Field(i)
 		if f.IsExported() {
-			if comma {
-				b.WriteString("- ")
-			}
-			fmt.Fprintf(b, f.Name)
 			fv := rv.Field(i)
-			b.WriteRune(':')
 			if fv.CanInterface() {
-				printOn(fv.Interface(), b)
+				kvs = append(kvs, kv{k: f.Name, v: fv.Interface()})
 			}
-			b.WriteString("\n")
-			comma = true
 		}
+	}
+	printKVsOn(kvs, b)
+}
+
+func printMapMarkdown(b *strings.Builder, rt reflect.Type, rv reflect.Value) {
+	r := rv.MapRange()
+	kvs := []kv{}
+	for r.Next() {
+		k := fmt.Sprintf("%v", r.Key())
+		v := r.Value()
+		if v.CanInterface() {
+			kvs = append(kvs, kv{k: k, v: v.Interface()})
+		}
+	}
+	printKVsOn(kvs, b)
+}
+
+type kv struct {
+	k string
+	v any
+}
+
+func printKVsOn(kvs []kv, b *strings.Builder) {
+	sort.Slice(kvs, func(i, j int) bool { return kvs[i].k < kvs[j].k })
+	for _, each := range kvs {
+		fmt.Fprintf(b, "- %s: %v\n", each.k, each.v)
 	}
 }
