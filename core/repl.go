@@ -47,12 +47,12 @@ func (a *ActionCommander) Loop() {
 			}
 			if entry == ":v" {
 				res := a.RunString("_variables()")
-				output(res.Data, true)
+				output(Print(res.RawData), true)
 				continue
 			}
 			if entry == ":p" {
 				res := a.RunString("_plugins()")
-				output(res.Data, true)
+				output(Print(res.RawData), true)
 				continue
 			}
 			if entry == ":d" {
@@ -61,7 +61,7 @@ func (a *ActionCommander) Loop() {
 			}
 			if entry == ":h" {
 				res := a.RunString("_showhelp()")
-				output(res.Data, true)
+				output(Print(res.RawData), true)
 				continue
 			}
 		}
@@ -69,14 +69,14 @@ func (a *ActionCommander) Loop() {
 		if strings.HasSuffix(entry, "?") {
 			src := fmt.Sprintf("_methods(%s)", entry[0:len(entry)-1])
 			res := a.RunString(src)
-			output(res.Data, true)
+			output(Print(res.RawData), true)
 			continue
 		}
 		// ! = open browser on object
 		if strings.HasSuffix(entry, "!") {
 			src := fmt.Sprintf("_browse(%s)", entry[0:len(entry)-1])
 			res := a.RunString(src)
-			output(res.Data, true)
+			output(Print(res.RawData), true)
 			continue
 		}
 		line.AppendHistory(entry)
@@ -84,7 +84,7 @@ func (a *ActionCommander) Loop() {
 		if res.Error != "" {
 			output(res.Error, false)
 		} else {
-			output(res.Data, true)
+			output(Print(res.RawData), true)
 		}
 	}
 exit:

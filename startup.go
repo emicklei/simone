@@ -41,7 +41,7 @@ func Start(cfg api.Config) {
 		if res.Error != "" {
 			json.NewEncoder(os.Stdout).Encode(res)
 		} else {
-			fmt.Println(res.Data)
+			fmt.Println(core.Print(res.RawData))
 		}
 		return
 	}

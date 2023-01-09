@@ -108,7 +108,6 @@ func (r *LocalRunner) RunString(entry string) api.EvalResult {
 		} else {
 			// no error
 			res.RawData = val
-			res.Data = Print(val)
 			res.Datatype = fmt.Sprintf("%T", val)
 		}
 	}
@@ -127,13 +126,13 @@ func (r *LocalRunner) initInternals() {
 
 func (r *LocalRunner) browseObject(v any) any {
 	if v == nil {
-		return ""
+		return "null"
 	}
 	// store value in temporary variable TODO cleanup?
 	key := "_" + randSeq(10) // make it internal such that :v will not show it
 	r.vm.Set(key, v)
 	open(fmt.Sprintf("http://%s/v1?action=browse&source=%s", r.config.HostPort(), key))
-	return nil
+	return v
 }
 
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
@@ -209,8 +208,8 @@ func (r *LocalRunner) Include(path string) api.EvalResult {
 	return r.RunString(string(data))
 }
 
-func (r *LocalRunner) markdownInspect(v any) any {
-	return PlainText(PrintMarkdown(v))
+func (r *LocalRunner) markdownInspect(v any) string {
+	return PrintMarkdown(v)
 }
 
 // Open calls the OS default program for uri
