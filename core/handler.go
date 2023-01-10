@@ -65,18 +65,29 @@ func (h *ActionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		// https://stackoverflow.com/questions/67749752/how-to-apply-styling-and-html-tags-on-hover-message-with-vscode-api
 		res = h.runner.RunString(fmt.Sprintf("_markdowninspect(%s)", ap.Source))
-		ires := api.InspectResult{
+		ires := api.HoverResult{
 			Error:    res.Error,
-			Markdown: res.Data,
+			Markdown: res.RawData.(string), // not so safe
 			Datatype: res.Datatype,
 		}
 		json.NewEncoder(w).Encode(ires)
 		return
-	case "eval", "inspect":
+	case "eval":
 		if api.Debug {
 			log.Println("eval", ap.Source)
 		}
 		res = h.runner.RunString(ap.Source)
+	case "inspect":
+		if api.Debug {
+			log.Println("inspect", ap.Source)
+		}
+		res = h.runner.RunString(ap.Source)
+		ires := api.InspectResult{
+			Error:    res.Error,
+			Datatype: res.Datatype,
+		}
+		json.NewEncoder(w).Encode(ires)
+		return
 	default:
 		if api.Debug {
 			log.Println("unknown or empty action:", ap.Action)
