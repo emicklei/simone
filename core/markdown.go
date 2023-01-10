@@ -10,6 +10,8 @@ import (
 	"github.com/emicklei/simone/api"
 )
 
+// https://stackoverflow.com/questions/67749752/how-to-apply-styling-and-html-tags-on-hover-message-with-vscode-api
+
 func PrintMarkdown(v any) string {
 	if v == nil {
 		return "null"
