@@ -132,8 +132,7 @@ func (r *LocalRunner) browseObject(v any) any {
 	// store value in temporary variable TODO cleanup?
 	key := "_" + randSeq(10) // make it internal such that :v will not show it
 	r.vm.Set(key, v)
-	open(fmt.Sprintf("http://%s/v1?action=browse&source=%s", r.config.HostPort(), key))
-	return nil
+	return open(fmt.Sprintf("http://%s/v1?action=browse&source=%s", r.config.HostPort(), key))
 }
 
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
