@@ -1,21 +1,23 @@
-## simone
+# simone
+
+[![GoDoc](https://godoc.org/github.com/emicklei/simone?status.svg)](https://pkg.go.dev/github.com/emicklei/simone?tab=doc)
 
 New kind of tool.
 
-## usage 
+## usage
 
 Simone is a package to build a Javascript engine with plugins in Go.
-See `examples` for a minimal program. 
+See `examples` for a minimal program.
 
 ## run flags
 
-    -c	start a client REPL
-    -h	show help
-    -i string
+    -c  start a client REPL
+    -h  show help
+    -i  string
         run the script from filename as input
-    -s string
+    -s  string
         run script from filename on startup
-    -v	verbose logging
+    -v  verbose logging
 
 ## optional plugins
 
