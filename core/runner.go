@@ -213,16 +213,14 @@ func (r *LocalRunner) markdownInspect(v any) string {
 
 // Open calls the OS default program for uri
 func open(uri string) error {
-	var run string
 	switch {
 	case "windows" == runtime.GOOS:
-		run = "start"
+		return exec.Command("rundll32", "url.dll,FileProtocolHandler", uri).Start()
 	case "darwin" == runtime.GOOS:
-		run = "open"
+		return exec.Command("open", uri).Start()
 	case "linux" == runtime.GOOS:
-		run = "xdg-open"
+		return exec.Command("xdg-open", uri).Start()
 	default:
 		return fmt.Errorf("Unable to open uri:%v on:%v", uri, runtime.GOOS)
 	}
-	return exec.Command(run, uri).Start()
 }
