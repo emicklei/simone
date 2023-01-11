@@ -7,14 +7,9 @@ type EvalResult struct {
 }
 
 type InspectResult struct {
-	Error string `json:"error"`
-	// TODO
-	IsArray     bool           `json:"isarray"`
-	Scalar      any            `json:"scalar"`
-	Object      map[string]any `json:"object"`
-	ObjectArray []any          `json:"objectarray"`
-
-	Datatype string `json:"datatype"`
+	Error    string         `json:"error"`
+	Object   map[string]any `json:"object"`
+	Datatype string         `json:"datatype"`
 }
 
 type HoverResult struct {

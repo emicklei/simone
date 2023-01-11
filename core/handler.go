@@ -87,10 +87,7 @@ func (h *ActionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			log.Println("inspect", ap.Source)
 		}
 		res = h.runner.RunString(ap.Source)
-		ires := api.InspectResult{
-			Error:    res.Error,
-			Datatype: res.Datatype,
-		}
+		ires := buildInspectResult(res)
 		json.NewEncoder(w).Encode(ires)
 		return
 	default:
