@@ -32,6 +32,11 @@ func buildInspectResult(res api.EvalResult) api.InspectResult {
 	default:
 		// check underlying type is map[string]any
 		rt := reflect.TypeOf(res.RawData)
+		rv := reflect.ValueOf(res.RawData)
+		if rt.Kind() == reflect.Pointer {
+			rt = rt.Elem()
+			rv = rv.Elem()
+		}
 		if rt.Kind() == reflect.Map {
 			if rt.Key().Kind() == reflect.String {
 				if rt.Elem().Kind() == reflect.Interface {
@@ -45,6 +50,31 @@ func buildInspectResult(res api.EvalResult) api.InspectResult {
 					return ires
 				}
 			}
+		}
+		if rt.Kind() == reflect.Struct {
+			m := map[string]any{}
+			for i := 0; i < rt.NumField(); i++ {
+				f := rt.Field(i)
+				if f.IsExported() {
+					fv := rv.Field(i)
+					if fv.CanInterface() {
+						m[f.Name] = rv.Field(i).Interface()
+					}
+				}
+			}
+			ires.Object = m
+			return ires
+		}
+		if rv.Kind() == reflect.Slice || rv.Kind() == reflect.Array {
+			m := map[string]any{}
+			for i := 0; i < rv.Len(); i++ {
+				ev := rv.Index(i)
+				if ev.CanInterface() {
+					m[strconv.Itoa(i)] = ev.Interface()
+				}
+			}
+			ires.Object = m
+			return ires
 		}
 		ires.Object = map[string]any{
 			"_": res.RawData,

@@ -21,7 +21,7 @@ func TestPrintMarkdown(t *testing.T) {
 	w := false
 	r := &Range{-1, 1, &w}
 	s = PrintMarkdown(r)
-	if got, want := flatten(s), "Low:-1!- High:1!- Inclusive:false!"; got != want {
+	if got, want := flatten(s), "github.com/emicklei/simone/core/Range!!- High: 1!- Inclusive: false!- Low: -1!"; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }

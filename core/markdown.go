@@ -83,6 +83,9 @@ func printStructMarkdown(b *strings.Builder, rt reflect.Type, rv reflect.Value) 
 		if f.IsExported() {
 			fv := rv.Field(i)
 			if fv.CanInterface() {
+				if fv.Kind() == reflect.Pointer {
+					fv = fv.Elem()
+				}
 				kvs = append(kvs, kv{k: f.Name, v: fv.Interface()})
 			}
 		}
@@ -97,6 +100,9 @@ func printMapMarkdown(b *strings.Builder, rt reflect.Type, rv reflect.Value) {
 		k := fmt.Sprintf("%v", r.Key())
 		v := r.Value()
 		if v.CanInterface() {
+			if v.Kind() == reflect.Pointer {
+				v = v.Elem()
+			}
 			kvs = append(kvs, kv{k: k, v: v.Interface()})
 		}
 	}

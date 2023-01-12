@@ -161,6 +161,9 @@ func printStruct(b *strings.Builder, rt reflect.Type, rv reflect.Value) {
 			fv := rv.Field(i)
 			b.WriteRune(':')
 			if fv.CanInterface() {
+				if fv.Kind() == reflect.Pointer {
+					fv = fv.Elem()
+				}
 				printOn(fv.Interface(), b)
 			}
 			comma = true
