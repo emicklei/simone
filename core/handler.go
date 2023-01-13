@@ -10,18 +10,18 @@ import (
 	"github.com/emicklei/simone/api"
 )
 
-// ActionHandler handles HTTP action requests
-type ActionHandler struct {
+// actionHandler handles HTTP action requests
+type actionHandler struct {
 	runner Runnable
 }
 
-func NewActionHandler(r Runnable) *ActionHandler {
-	return &ActionHandler{
+func NewActionHandler(r Runnable) *actionHandler {
+	return &actionHandler{
 		runner: r,
 	}
 }
 
-func (h *ActionHandler) handleGet(w http.ResponseWriter, r *http.Request) {
+func (h *actionHandler) handleGet(w http.ResponseWriter, r *http.Request) {
 	ap := NewActionParams(r)
 	switch ap.Action {
 	case "browse":
@@ -42,7 +42,7 @@ func (h *ActionHandler) handleGet(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotFound)
 }
 
-func (h *ActionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *actionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	if api.Debug {
 		log.Println(r.Method, r.URL.RequestURI())

@@ -23,17 +23,17 @@ type Runnable interface {
 	RunString(entry string) api.EvalResult
 }
 
-type RemoteRunner struct {
+type remoteRunner struct {
 	client *http.Client
 }
 
-func NewRemoteRunner() *RemoteRunner {
-	return &RemoteRunner{
+func NewRemoteRunner() *remoteRunner {
+	return &remoteRunner{
 		client: new(http.Client),
 	}
 }
 
-func (r *RemoteRunner) RunString(entry string) api.EvalResult {
+func (r *remoteRunner) RunString(entry string) api.EvalResult {
 	body := bytes.NewBufferString(entry)
 	req, err := http.NewRequest(http.MethodPost, "http://localhost:9119/v1", body)
 	res := api.EvalResult{}
@@ -41,7 +41,7 @@ func (r *RemoteRunner) RunString(entry string) api.EvalResult {
 		res.Error = err.Error()
 		return res
 	}
-	ap := ActionParams{
+	ap := actionParams{
 		Debug:  true,
 		Line:   "1",
 		File:   "cli",
@@ -73,7 +73,7 @@ type LocalRunner struct {
 func NewLocalRunner(cfg api.Config) *LocalRunner {
 	vm := goja.New()
 	local := &LocalRunner{vm: vm, config: cfg}
-	InitBuiltins(vm)
+	initBuiltins(vm)
 	// init all plugins
 	for _, each := range cfg.Plugins {
 		ns := each.Namespace()

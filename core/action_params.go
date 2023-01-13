@@ -6,7 +6,7 @@ import (
 	"net/url"
 )
 
-type ActionParams struct {
+type actionParams struct {
 	Debug  bool
 	Line   string //zero-based
 	Action string
@@ -14,7 +14,7 @@ type ActionParams struct {
 	Source string
 }
 
-func (p ActionParams) Inject(base *url.URL) {
+func (p actionParams) Inject(base *url.URL) {
 	vals := base.Query()
 	if p.Debug {
 		vals.Add("debug", "true")
@@ -25,7 +25,7 @@ func (p ActionParams) Inject(base *url.URL) {
 	base.RawQuery = vals.Encode()
 }
 
-func NewActionParams(req *http.Request) ActionParams {
+func NewActionParams(req *http.Request) actionParams {
 	base := req.URL
 	body, err := io.ReadAll(req.Body)
 	if err == nil {
@@ -35,7 +35,7 @@ func NewActionParams(req *http.Request) ActionParams {
 		// try get it from the query parameter
 		body = []byte(base.Query().Get("source"))
 	}
-	return ActionParams{
+	return actionParams{
 		Debug:  base.Query().Get("debug") == "true",
 		Line:   base.Query().Get("line"),
 		Action: base.Query().Get("action"),

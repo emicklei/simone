@@ -10,19 +10,19 @@ import (
 	"github.com/peterh/liner"
 )
 
-type ActionCommander struct {
+type actionCommander struct {
 	runner Runnable
 }
 
-func NewActionCommander(r Runnable) *ActionCommander {
-	return &ActionCommander{
+func NewActionCommander(r Runnable) *actionCommander {
+	return &actionCommander{
 		runner: r,
 	}
 }
 
 const hist = ".simone"
 
-func (a *ActionCommander) Loop() {
+func (a *actionCommander) Loop() {
 	line := liner.NewLiner()
 	line.SetCtrlCAborts(true)
 
@@ -105,6 +105,6 @@ func output(v any, ok bool) {
 	}
 }
 
-func (a *ActionCommander) RunString(entry string) api.EvalResult {
+func (a *actionCommander) RunString(entry string) api.EvalResult {
 	return a.runner.RunString(entry)
 }

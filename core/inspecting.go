@@ -13,6 +13,11 @@ type CanBeObject interface {
 }
 
 func buildInspectResult(res api.EvalResult) api.InspectResult {
+	if res.RawData == nil {
+		// TODO how to inspect null
+		m := map[string]any{"_": "null"}
+		return api.InspectResult{Datatype: "?", Object: m}
+	}
 	if res.Error != "" {
 		return api.InspectResult{
 			Error:    res.Error,

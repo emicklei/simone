@@ -7,7 +7,7 @@ import (
 	"github.com/dop251/goja"
 )
 
-func InitBuiltins(vm *goja.Runtime) {
+func initBuiltins(vm *goja.Runtime) {
 	vm.Set("log", func(arg ...any) {
 		log.Println(arg...)
 	})
