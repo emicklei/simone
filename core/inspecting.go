@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 
 	"github.com/emicklei/simone/api"
 )
@@ -45,7 +46,7 @@ func buildInspectResult(res api.EvalResult) api.InspectResult {
 					rv := reflect.ValueOf(res.RawData)
 					iter := rv.MapRange()
 					for iter.Next() {
-						m[iter.Key().String()] = iter.Value().Interface()
+						m[iter.Key().String()] = valueOrPrintstring(iter.Value().Interface())
 					}
 					ires.Object = m
 					return ires
@@ -59,7 +60,7 @@ func buildInspectResult(res api.EvalResult) api.InspectResult {
 				if f.IsExported() {
 					fv := rv.Field(i)
 					if fv.CanInterface() {
-						m[f.Name] = rv.Field(i).Interface()
+						m[f.Name] = valueOrPrintstring(rv.Field(i).Interface())
 					}
 				}
 			}
@@ -71,7 +72,7 @@ func buildInspectResult(res api.EvalResult) api.InspectResult {
 			for i := 0; i < rv.Len(); i++ {
 				ev := rv.Index(i)
 				if ev.CanInterface() {
-					m[strconv.Itoa(i)] = ev.Interface()
+					m[strconv.Itoa(i)] = valueOrPrintstring(ev.Interface())
 				}
 			}
 			ires.Object = m
@@ -82,4 +83,18 @@ func buildInspectResult(res api.EvalResult) api.InspectResult {
 		}
 	}
 	return ires
+}
+
+// valueOrPrintstring checks registered printers
+func valueOrPrintstring(v any) any {
+	rt := reflect.TypeOf(v)
+	if rt.Kind() == reflect.Pointer {
+		rt = rt.Elem()
+	}
+	if pf, ok := printer.registry[rt]; ok {
+		b := new(strings.Builder)
+		pf(v, b)
+		return b.String()
+	}
+	return v
 }
