@@ -19,7 +19,7 @@ import (
 	"github.com/emicklei/simone/api"
 )
 
-type Runnable interface {
+type runnable interface {
 	RunString(entry string) api.EvalResult
 }
 
@@ -27,7 +27,7 @@ type remoteRunner struct {
 	client *http.Client
 }
 
-func NewRemoteRunner() *remoteRunner {
+func newRemoteRunner() *remoteRunner {
 	return &remoteRunner{
 		client: new(http.Client),
 	}
@@ -65,14 +65,14 @@ func (r *remoteRunner) RunString(entry string) api.EvalResult {
 	return res
 }
 
-type LocalRunner struct {
+type localRunner struct {
 	vm     *goja.Runtime
 	config api.Config
 }
 
-func NewLocalRunner(cfg api.Config) *LocalRunner {
+func newLocalRunner(cfg api.Config) *localRunner {
 	vm := goja.New()
-	local := &LocalRunner{vm: vm, config: cfg}
+	local := &localRunner{vm: vm, config: cfg}
 	initBuiltins(vm)
 	// init all plugins
 	for _, each := range cfg.Plugins {
@@ -94,7 +94,7 @@ func NewLocalRunner(cfg api.Config) *LocalRunner {
 	return local
 }
 
-func (r *LocalRunner) RunString(entry string) api.EvalResult {
+func (r *localRunner) RunString(entry string) api.EvalResult {
 	res := api.EvalResult{}
 	result, err := r.vm.RunString(entry)
 	if err != nil {
@@ -114,7 +114,7 @@ func (r *LocalRunner) RunString(entry string) api.EvalResult {
 	return res
 }
 
-func (r *LocalRunner) initInternals() {
+func (r *localRunner) initInternals() {
 	r.vm.Set("_plugins", r.pluginInfo)
 	r.vm.Set("_variables", r.globalVariables)
 	r.vm.Set("_toggledebug", r.toggleDebug)
@@ -124,7 +124,7 @@ func (r *LocalRunner) initInternals() {
 	r.vm.Set("_markdowninspect", r.markdownInspect)
 }
 
-func (r *LocalRunner) browseObject(v any) any {
+func (r *localRunner) browseObject(v any) any {
 	if v == nil {
 		return "null"
 	}
@@ -144,7 +144,7 @@ func randSeq(n int) string {
 	return string(b)
 }
 
-func (r *LocalRunner) showMethods(v any) PlainText {
+func (r *localRunner) showMethods(v any) PlainText {
 	if v == nil {
 		return ""
 	}
@@ -154,11 +154,11 @@ func (r *LocalRunner) showMethods(v any) PlainText {
 	return PlainText(b.String())
 }
 
-func (r *LocalRunner) showHelp() string {
+func (r *localRunner) showHelp() string {
 	return "no help yet"
 }
 
-func (r *LocalRunner) toggleDebug() {
+func (r *localRunner) toggleDebug() {
 	if api.Debug {
 		api.Debug = false
 		log.Println("verbose log disabled")
@@ -168,14 +168,14 @@ func (r *LocalRunner) toggleDebug() {
 	}
 }
 
-func (r *LocalRunner) pluginInfo() (list []string) {
+func (r *localRunner) pluginInfo() (list []string) {
 	for _, each := range r.config.Plugins {
 		list = append(list, each.Namespace())
 	}
 	return
 }
 
-func (r *LocalRunner) globalVariables() (filtered []string) {
+func (r *localRunner) globalVariables() (filtered []string) {
 	for _, each := range r.vm.GlobalObject().Keys() {
 		// skip internal var and funcs
 		if strings.HasPrefix(each, "_") {
@@ -197,7 +197,7 @@ func (r *LocalRunner) globalVariables() (filtered []string) {
 	return
 }
 
-func (r *LocalRunner) Include(path string) api.EvalResult {
+func (r *localRunner) Include(path string) api.EvalResult {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return api.EvalResult{
@@ -207,7 +207,7 @@ func (r *LocalRunner) Include(path string) api.EvalResult {
 	return r.RunString(string(data))
 }
 
-func (r *LocalRunner) markdownInspect(v any) string {
+func (r *localRunner) markdownInspect(v any) string {
 	return PrintMarkdown(v)
 }
 

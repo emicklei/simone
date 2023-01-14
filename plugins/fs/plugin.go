@@ -18,6 +18,7 @@ func (s *Plugin) Init(vm *goja.Runtime) error {
 	return nil
 }
 
+// Dir is available as `fs.Dir`
 func (s *Plugin) Dir() (list []string) {
 	files, err := os.ReadDir(s.workdir)
 	if err != nil {
@@ -29,6 +30,7 @@ func (s *Plugin) Dir() (list []string) {
 	return
 }
 
+// Chdir is available as `fs.Chdir`
 func (s *Plugin) Chdir(path string) string {
 	if filepath.IsAbs(path) {
 		s.workdir = path

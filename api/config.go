@@ -7,11 +7,16 @@ import (
 	"github.com/dop251/goja"
 )
 
+// Debug can be set on startup or by REPL command ":d"
 var Debug = false
 
 type Config struct {
 	// Optional for initialization
-	Script string
+	StartupScript string
+	// Optional for command line mode
+	RunScript string
+	// Optional for remote client mode
+	RemoteClient bool
 	// Required for CORS
 	Origin string
 	// Optional when running as a service

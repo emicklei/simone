@@ -7,6 +7,7 @@ New kind of tool.
 ## usage
 
 Simone is a package to build a Javascript engine with plugins in Go.
+By implementing exposed methods on plugins, functions are added to the runtime.
 See `examples` for a minimal program.
 
 ## run flags

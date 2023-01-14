@@ -8,10 +8,6 @@ import (
 	"github.com/emicklei/simone/api"
 )
 
-type CanBeObject interface {
-	ToObject() map[string]any
-}
-
 func buildInspectResult(res api.EvalResult) api.InspectResult {
 	if res.RawData == nil {
 		// TODO how to inspect null

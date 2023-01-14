@@ -11,10 +11,10 @@ import (
 )
 
 type actionCommander struct {
-	runner Runnable
+	runner runnable
 }
 
-func NewActionCommander(r Runnable) *actionCommander {
+func newActionCommander(r runnable) *actionCommander {
 	return &actionCommander{
 		runner: r,
 	}

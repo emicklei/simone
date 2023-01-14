@@ -12,17 +12,17 @@ import (
 
 // actionHandler handles HTTP action requests
 type actionHandler struct {
-	runner Runnable
+	runner runnable
 }
 
-func NewActionHandler(r Runnable) *actionHandler {
+func newActionHandler(r runnable) *actionHandler {
 	return &actionHandler{
 		runner: r,
 	}
 }
 
 func (h *actionHandler) handleGet(w http.ResponseWriter, r *http.Request) {
-	ap := NewActionParams(r)
+	ap := newActionParams(r)
 	switch ap.Action {
 	case "browse":
 		if api.Debug {
@@ -57,7 +57,7 @@ func (h *actionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	res := api.EvalResult{}
-	ap := NewActionParams(r)
+	ap := newActionParams(r)
 	switch ap.Action {
 	case "hover":
 		if api.Debug {

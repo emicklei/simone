@@ -25,7 +25,7 @@ func (p actionParams) Inject(base *url.URL) {
 	base.RawQuery = vals.Encode()
 }
 
-func NewActionParams(req *http.Request) actionParams {
+func newActionParams(req *http.Request) actionParams {
 	base := req.URL
 	body, err := io.ReadAll(req.Body)
 	if err == nil {
