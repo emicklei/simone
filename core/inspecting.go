@@ -47,7 +47,7 @@ func buildInspectResult(res api.EvalResult) api.InspectResult {
 					iter := rv.MapRange()
 					for iter.Next() {
 						iv := iter.Value()
-						if iv.CanInterface() && !iv.IsZero() {
+						if iv.CanInterface() && iv.IsValid() {
 							m[iter.Key().String()] = valueOrPrintstring(iv.Interface())
 						} else {
 							m[iter.Key().String()] = nil
@@ -65,7 +65,7 @@ func buildInspectResult(res api.EvalResult) api.InspectResult {
 				if f.IsExported() {
 					fv := rv.Field(i)
 					if fv.CanInterface() {
-						if !fv.IsZero() {
+						if fv.IsValid() {
 							m[f.Name] = valueOrPrintstring(rv.Field(i).Interface())
 						} else {
 							m[f.Name] = nil
@@ -81,7 +81,7 @@ func buildInspectResult(res api.EvalResult) api.InspectResult {
 			for i := 0; i < rv.Len(); i++ {
 				ev := rv.Index(i)
 				if ev.CanInterface() {
-					if !ev.IsZero() {
+					if ev.IsValid() {
 						m[strconv.Itoa(i)] = valueOrPrintstring(ev.Interface())
 					} else {
 						m[strconv.Itoa(i)] = nil
