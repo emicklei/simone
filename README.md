@@ -52,3 +52,10 @@ If you postfix an entry with a `!` then it browse the result in a Web page.
 
 For POST the source is transported with the request body
 For GET the source can be passed as a query parameter.
+
+| action | description
+| - | -
+| eval | evaluate the source and return a EvalResult in JSON
+| inspect | evaluate the source and return an InspectResult in JSON
+| hover | lookup a variable, plugin or function and return a HoverResult in JSON
+
