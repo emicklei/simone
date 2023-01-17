@@ -46,7 +46,12 @@ func buildInspectResult(res api.EvalResult) api.InspectResult {
 					rv := reflect.ValueOf(res.RawData)
 					iter := rv.MapRange()
 					for iter.Next() {
-						m[iter.Key().String()] = valueOrPrintstring(iter.Value().Interface())
+						iv := iter.Value()
+						if iv.CanInterface() && !iv.IsZero() {
+							m[iter.Key().String()] = valueOrPrintstring(iv.Interface())
+						} else {
+							m[iter.Key().String()] = nil
+						}
 					}
 					ires.Object = m
 					return ires
@@ -60,7 +65,11 @@ func buildInspectResult(res api.EvalResult) api.InspectResult {
 				if f.IsExported() {
 					fv := rv.Field(i)
 					if fv.CanInterface() {
-						m[f.Name] = valueOrPrintstring(rv.Field(i).Interface())
+						if !fv.IsZero() {
+							m[f.Name] = valueOrPrintstring(rv.Field(i).Interface())
+						} else {
+							m[f.Name] = nil
+						}
 					}
 				}
 			}
@@ -72,7 +81,11 @@ func buildInspectResult(res api.EvalResult) api.InspectResult {
 			for i := 0; i < rv.Len(); i++ {
 				ev := rv.Index(i)
 				if ev.CanInterface() {
-					m[strconv.Itoa(i)] = valueOrPrintstring(ev.Interface())
+					if !ev.IsZero() {
+						m[strconv.Itoa(i)] = valueOrPrintstring(ev.Interface())
+					} else {
+						m[strconv.Itoa(i)] = nil
+					}
 				}
 			}
 			ires.Object = m

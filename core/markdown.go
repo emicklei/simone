@@ -59,7 +59,9 @@ func printSliceMarkdownOn(anyValue reflect.Value, sliceType reflect.Type, b *str
 		each := anyValue.Index(f)
 		if each.CanInterface() {
 			fmt.Fprintf(b, "%d. ", f)
-			printMarkdownOn(each.Interface(), b)
+			if !each.IsZero() {
+				printMarkdownOn(each.Interface(), b)
+			}
 			b.WriteRune('\n')
 		}
 	}
@@ -103,7 +105,11 @@ func printMapMarkdown(b *strings.Builder, rt reflect.Type, rv reflect.Value) {
 			if v.Kind() == reflect.Pointer {
 				v = v.Elem()
 			}
-			kvs = append(kvs, kv{k: k, v: v.Interface()})
+			if !v.IsZero() {
+				kvs = append(kvs, kv{k: k, v: v.Interface()})
+			} else {
+				kvs = append(kvs, kv{k: k})
+			}
 		}
 	}
 	printKVsOn(kvs, b)
