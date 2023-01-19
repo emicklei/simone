@@ -59,3 +59,14 @@ func TestBuildInspect_Array(t *testing.T) {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 	}
 }
+
+func TestBuildInspect_Map(t *testing.T) {
+	m := map[string]any{
+		"hello": []int{42},
+	}
+	res := api.EvalResult{RawData: m}
+	ires := buildInspectResult(res)
+	if got, want := ires.Datatype, "map[string]interface {}"; got != want {
+		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
+	}
+}

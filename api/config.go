@@ -26,7 +26,7 @@ type Config struct {
 	Plugins []Plugin
 	// If set then this function is called on Start after all plugins are started
 	Setup RuntimeSetupFunc
-	// If set then this function is installed on the webserver to handle requests on "/"
+	// If set then this function is installed on the webserver to handle requests on "/" ( /v1 is used )
 	HttpHandler http.Handler
 }
 

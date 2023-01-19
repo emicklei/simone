@@ -76,7 +76,9 @@ func (a *actionCommander) Loop() {
 		if strings.HasSuffix(entry, "!") {
 			src := fmt.Sprintf("_browse(%s)", entry[0:len(entry)-1])
 			res := a.RunString(src)
-			output(Print(res.RawData), true)
+			if res.Error != "" {
+				output(Print(res.RawData), true)
+			}
 			continue
 		}
 		line.AppendHistory(entry)
@@ -106,5 +108,10 @@ func output(v any, ok bool) {
 }
 
 func (a *actionCommander) RunString(entry string) api.EvalResult {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Printf("\033[1;31mdo not panic:%v\033[0m\n", r)
+		}
+	}()
 	return a.runner.RunString(entry)
 }

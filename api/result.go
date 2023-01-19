@@ -7,13 +7,18 @@ type EvalResult struct {
 }
 
 type InspectResult struct {
-	Error    string         `json:"error"`
-	Object   map[string]any `json:"object"`
-	Datatype string         `json:"datatype"`
+	Error    string                `json:"error"`
+	Object   map[string]any        `json:"object"`
+	Paths    map[string]AccessPath `json:"paths"`
+	Datatype string                `json:"datatype"`
 }
 
 type HoverResult struct {
 	Error    string `json:"error"`
 	Markdown string `json:"markdown"`
 	Datatype string `json:"datatype"`
+}
+
+type AccessPath struct {
+	Expression string
 }

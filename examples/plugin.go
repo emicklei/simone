@@ -26,3 +26,7 @@ func (d *Demo) Thing() Thing {
 		When: time.Now(),
 	}
 }
+
+func (d *Demo) Panic() {
+	panic("stay calm")
+}

@@ -177,9 +177,11 @@ func (r *localRunner) pluginInfo() (list []string) {
 
 func (r *localRunner) globalVariables() (filtered []string) {
 	for _, each := range r.vm.GlobalObject().Keys() {
-		// skip internal var and funcs
-		if strings.HasPrefix(each, "_") {
-			continue
+		// skip internal var and funcs (unless debugging)
+		if !api.Debug {
+			if strings.HasPrefix(each, "_") {
+				continue
+			}
 		}
 		v := r.vm.Get(each)
 		vt := v.ExportType()
@@ -204,6 +206,7 @@ func (r *localRunner) Include(path string) api.EvalResult {
 			Error: err.Error(),
 		}
 	}
+	log.Printf("\033[1;34mrunning %s\033[0m\n", path)
 	return r.RunString(string(data))
 }
 

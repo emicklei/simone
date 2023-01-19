@@ -59,3 +59,16 @@ For GET the source can be passed as a query parameter.
 | inspect | evaluate the source and return an InspectResult in JSON
 | hover | lookup a variable, plugin or function and return a HoverResult in JSON
 
+## advanced
+
+There are some (unsupported) hidden functions used by the REPL that could be used in scripts:
+See also `localRunner::initInternals`.
+
+### _browse(`expression`)
+
+Opens the browser on the result of evaluating the `expression`.
+
+### _markdowninspect(`expression`)
+
+Returns Markdown for inspecting the result of evaluating the `expression`.
+
