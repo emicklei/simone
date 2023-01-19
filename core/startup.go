@@ -55,9 +55,13 @@ func startHTTP(cfg api.Config, r runnable) {
 		cfg.HttpAddr = ":9119"
 	}
 	handler := newActionHandler(r)
-	log.Println("simone is serving on localhost" + cfg.HttpAddr)
 	mux := http.NewServeMux()
 	mux.Handle("/v1", handler)
+	if cfg.HttpHandler != nil {
+		log.Println("installing custom HTTP handler on \"/\"")
+		mux.Handle("/", cfg.HttpHandler)
+	}
+	log.Println("simone is serving on localhost" + cfg.HttpAddr)
 	panic(http.ListenAndServe(cfg.HttpAddr, cc.Handler(mux)))
 }
 

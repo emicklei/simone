@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/dop251/goja"
@@ -25,6 +26,8 @@ type Config struct {
 	Plugins []Plugin
 	// If set then this function is called on Start after all plugins are started
 	Setup RuntimeSetupFunc
+	// If set then this function is installed on the webserver to handle requests on "/"
+	HttpHandler http.Handler
 }
 
 // RuntimeSetupFunc is the signature of the Setup callback.
