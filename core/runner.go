@@ -151,7 +151,7 @@ func randSeq(n int) string {
 	return string(b)
 }
 
-func (r *localRunner) handleLogin(plugin any, username, password string) any {
+func (r *localRunner) handleLogin(plugin any, username, password string) error {
 	if handler, ok := plugin.(api.LoginHandler); ok {
 		return handler.Login(username, password)
 	}

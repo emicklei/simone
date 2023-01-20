@@ -89,7 +89,7 @@ func (a *actionCommander) Loop() {
 				}
 				res := a.RunString(fmt.Sprintf("_login(%s,%q,%q)", target, username, password))
 				if res.Error != "" {
-					output(Print(res.RawData), true)
+					output(Print(res.Error), false)
 				}
 				continue
 			}
