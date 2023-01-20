@@ -74,19 +74,20 @@ func newLocalRunner(cfg api.Config) *localRunner {
 	vm := goja.New()
 	local := &localRunner{vm: vm, config: cfg}
 	initBuiltins(vm)
+	var ctx api.PluginContext = local
 	// init all plugins
 	for _, each := range cfg.Plugins {
 		ns := each.Namespace()
 		log.Println("init plugin", ns)
 		vm.Set(ns, each)
-		if err := each.Init(vm); err != nil {
+		if err := each.Init(ctx); err != nil {
 			log.Fatal(err)
 		}
 	}
 	local.initInternals()
 	if cfg.Setup != nil {
 		log.Println("custom setting up Javascript virtual machine")
-		if err := cfg.Setup(vm); err != nil {
+		if err := cfg.Setup(ctx); err != nil {
 			log.Fatal(err)
 		}
 	}
@@ -122,6 +123,7 @@ func (r *localRunner) initInternals() {
 	r.vm.Set("_methods", r.showMethods)
 	r.vm.Set("_browse", r.browseObject)
 	r.vm.Set("_markdowninspect", r.markdownInspect)
+	r.vm.Set("_login", r.handleLogin)
 }
 
 func (r *localRunner) browseObject(v any) any {
@@ -142,6 +144,13 @@ func randSeq(n int) string {
 		b[i] = letters[rand.Intn(len(letters))]
 	}
 	return string(b)
+}
+
+func (r *localRunner) handleLogin(plugin any, username, password string) any {
+	if handler, ok := plugin.(api.LoginHandler); ok {
+		return handler.Login(username, password)
+	}
+	return fmt.Errorf("%v cannot handle login", plugin)
 }
 
 func (r *localRunner) showMethods(v any) PlainText {

@@ -31,7 +31,7 @@ func (a *actionCommander) Loop() {
 		f.Close()
 	}
 
-	fmt.Printf("\033[1;32m%s\033[0m\n", ":q (quit) :h (help) :v (variables) :p (plugins) :d (verbose)")
+	fmt.Printf("\033[1;32m%s\033[0m\n", ":q (quit) :h (help) :v (variables) :p (plugins) :l (login) :d (verbose)")
 
 	defer line.Close()
 	for {
@@ -62,6 +62,35 @@ func (a *actionCommander) Loop() {
 			if entry == ":h" {
 				res := a.RunString("_showhelp()")
 				output(Print(res.RawData), true)
+				continue
+			}
+			if strings.HasPrefix(entry, ":l") {
+				target := ""
+				if arg := entry[2:]; len(arg) > 0 {
+					target = strings.Trim(arg, " ")
+				}
+				if target == "" {
+					input, err := line.Prompt("  plugin:")
+					if err != nil {
+						output(Print(err), false)
+						continue
+					}
+					target = input
+				}
+				username, err := line.Prompt(fmt.Sprintf("  [%s] user:", target))
+				if err != nil {
+					output(Print(err), false)
+					continue
+				}
+				password, err := line.PasswordPrompt(fmt.Sprintf("  [%s] password:", target))
+				if err != nil {
+					output(Print(err), false)
+					continue
+				}
+				res := a.RunString(fmt.Sprintf("_login(%s,%q,%q)", target, username, password))
+				if res.Error != "" {
+					output(Print(res.RawData), true)
+				}
 				continue
 			}
 		}

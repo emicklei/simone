@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/dop251/goja"
+	"github.com/emicklei/simone/api"
 )
 
 type Plugin struct {
@@ -13,7 +13,7 @@ type Plugin struct {
 
 func (s *Plugin) Namespace() string { return "fs" }
 
-func (s *Plugin) Init(vm *goja.Runtime) error {
+func (s *Plugin) Init(ctx api.PluginContext) error {
 	s.workdir, _ = os.Getwd()
 	return nil
 }

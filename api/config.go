@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-
-	"github.com/dop251/goja"
 )
 
 // Debug can be set on startup or by REPL command ":d"
@@ -31,7 +29,7 @@ type Config struct {
 }
 
 // RuntimeSetupFunc is the signature of the Setup callback.
-type RuntimeSetupFunc func(vm *goja.Runtime) error
+type RuntimeSetupFunc func(ctx PluginContext) error
 
 // HostPort returns host:port
 func (c Config) HostPort() string {

@@ -1,16 +1,17 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
-	"github.com/dop251/goja"
+	"github.com/emicklei/simone/api"
 )
 
 type Demo struct{}
 
 func (d *Demo) Namespace() string { return "demo" }
 
-func (d *Demo) Init(vm *goja.Runtime) error { return nil }
+func (d *Demo) Init(ctx api.PluginContext) error { return nil }
 
 // demo.time()
 func (d *Demo) Time() time.Time { return time.Now() }
@@ -29,4 +30,10 @@ func (d *Demo) Thing() Thing {
 
 func (d *Demo) Panic() {
 	panic("stay calm")
+}
+
+// Implements LoginHandler to be called with `:l demo`
+func (d *Demo) Login(username, password string) error {
+	fmt.Println("[demo] logging with username:", username)
+	return nil
 }
