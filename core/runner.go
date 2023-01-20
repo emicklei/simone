@@ -95,6 +95,11 @@ func newLocalRunner(cfg api.Config) *localRunner {
 	return local
 }
 
+// Set implements api.PluginContext
+func (r *localRunner) Set(name string, value any) error {
+	return r.vm.Set(name, value)
+}
+
 func (r *localRunner) RunString(entry string) api.EvalResult {
 	res := api.EvalResult{}
 	result, err := r.vm.RunString(entry)

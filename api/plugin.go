@@ -14,7 +14,10 @@ type Plugin interface {
 // PrintFunc is used to register a custom printer for a give typed value.
 type PrintFunc func(v any, b *strings.Builder)
 
-type PluginContext interface{}
+type PluginContext interface {
+	// Set adds a value (value or function) to the Javascript VM namespace
+	Set(name string, value any) error
+}
 
 type LoginHandler interface {
 	Login(username, password string) error
