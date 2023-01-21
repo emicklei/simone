@@ -38,6 +38,8 @@ func Start(cfg api.Config) {
 	if initFilename := cfg.StartupScript; initFilename != "" {
 		r.Include(initFilename)
 	}
+	// not inside go-routine because that messes up the logging
+	log.Println("serving HTTP on localhost" + cfg.HttpAddr)
 	go startHTTP(cfg, r)
 	startREPL(r)
 }
@@ -61,12 +63,14 @@ func startHTTP(cfg api.Config, r runnable) {
 		log.Println("installing custom HTTP handler on \"/\"")
 		mux.Handle("/", cfg.HttpHandler)
 	}
-	log.Println("simone is serving on localhost" + cfg.HttpAddr)
 	panic(http.ListenAndServe(cfg.HttpAddr, cc.Handler(mux)))
 }
 
 // startREPL is blocking
 func startREPL(r runnable) {
 	cmd := newActionCommander(r)
+	loginfo("simone - a Javascript engine service")
+	fmt.Printf("\033[1;32m%s\033[0m\n", ":q (quit) :h (help) :v (variables) :p (plugins) :l (login) :d (verbose)")
 	cmd.Loop()
+	loginfo("simone says bye!")
 }

@@ -14,11 +14,13 @@ type Plugin interface {
 // PrintFunc is used to register a custom printer for a give typed value.
 type PrintFunc func(v any, b *strings.Builder)
 
+// LoginFunc is used to call on the plugin when the user is providing credentials.
+type LoginFunc func(username, password string) error
+
 type PluginContext interface {
 	// Set adds a value (value or function) to the Javascript VM namespace
 	Set(name string, value any) error
-}
 
-type LoginHandler interface {
-	Login(username, password string) error
+	// OnLogin adds the loginHandler which is called when using the `:l (login)` feature.
+	OnLogin(plugin Plugin, loginHandler LoginFunc)
 }
