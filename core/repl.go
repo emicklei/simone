@@ -30,9 +30,6 @@ func (a *actionCommander) Loop() {
 		line.ReadHistory(f)
 		f.Close()
 	}
-
-	fmt.Printf("\033[1;32m%s\033[0m\n", ":q (quit) :h (help) :v (variables) :p (plugins) :l (login) :d (verbose)")
-
 	defer line.Close()
 	for {
 		entry, err := line.Prompt("⨁ ")
@@ -93,6 +90,8 @@ func (a *actionCommander) Loop() {
 				}
 				continue
 			}
+			output("unknown command "+entry, false)
+			continue
 		}
 		// ? = what can this value do
 		if strings.HasSuffix(entry, "?") {
@@ -119,7 +118,6 @@ func (a *actionCommander) Loop() {
 		}
 	}
 exit:
-	fmt.Printf("\033[1;32m%s\033[0m\n", "simone says bye!")
 	if f, err := os.Create(hist); err != nil {
 		log.Print("Error writing history file: ", err)
 	} else {

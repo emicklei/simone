@@ -34,3 +34,6 @@ func Start(cfg api.Config) {
 	cfg.RemoteClient = *oClient
 	core.Start(cfg)
 }
+
+// RegisterPrinter is an alias for core impl
+var RegisterPrinter = core.RegisterPrinter

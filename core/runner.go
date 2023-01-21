@@ -66,13 +66,17 @@ func (r *remoteRunner) RunString(entry string) api.EvalResult {
 }
 
 type localRunner struct {
-	vm     *goja.Runtime
-	config api.Config
+	vm             *goja.Runtime
+	config         api.Config
+	loginCallbacks map[string]api.LoginFunc
 }
 
 func newLocalRunner(cfg api.Config) *localRunner {
 	vm := goja.New()
-	local := &localRunner{vm: vm, config: cfg}
+	local := &localRunner{
+		vm:             vm,
+		config:         cfg,
+		loginCallbacks: map[string]api.LoginFunc{}}
 	initBuiltins(vm)
 	var ctx api.PluginContext = local
 	// init all plugins
@@ -98,6 +102,11 @@ func newLocalRunner(cfg api.Config) *localRunner {
 // Set implements api.PluginContext
 func (r *localRunner) Set(name string, value any) error {
 	return r.vm.Set(name, value)
+}
+
+// OnLogin implements api.PluginContext
+func (r *localRunner) OnLogin(plugin api.Plugin, callback api.LoginFunc) {
+	r.loginCallbacks[plugin.Namespace()] = callback
 }
 
 func (r *localRunner) RunString(entry string) api.EvalResult {
@@ -151,11 +160,16 @@ func randSeq(n int) string {
 	return string(b)
 }
 
-func (r *localRunner) handleLogin(plugin any, username, password string) any {
-	if handler, ok := plugin.(api.LoginHandler); ok {
-		return handler.Login(username, password)
+func (r *localRunner) handleLogin(v any, username, password string) any {
+	plugin, ok := v.(api.Plugin)
+	if !ok {
+		return fmt.Errorf("%v cannot handle login", v)
 	}
-	return fmt.Errorf("%v cannot handle login", plugin)
+	callback, ok := r.loginCallbacks[plugin.Namespace()]
+	if !ok {
+		return fmt.Errorf("%v cannot handle login", v)
+	}
+	return callback(username, password)
 }
 
 func (r *localRunner) showMethods(v any) PlainText {

@@ -11,7 +11,11 @@ type Demo struct{}
 
 func (d *Demo) Namespace() string { return "demo" }
 
-func (d *Demo) Init(ctx api.PluginContext) error { return nil }
+func (d *Demo) Init(ctx api.PluginContext) error {
+	// to be called with `:l demo`
+	ctx.OnLogin(d, d.login)
+	return nil
+}
 
 // demo.time()
 func (d *Demo) Time() time.Time { return time.Now() }
@@ -32,8 +36,8 @@ func (d *Demo) Panic() {
 	panic("stay calm")
 }
 
-// Implements LoginHandler to be called with `:l demo`
-func (d *Demo) Login(username, password string) error {
-	fmt.Println("[demo] logging with username:", username)
+// to be called with `:l demo`
+func (d *Demo) login(username, password string) error {
+	fmt.Println("[demo] logging with username:", username, "and password:", password)
 	return nil
 }

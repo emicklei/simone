@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"reflect"
 	"strings"
 
@@ -21,6 +22,7 @@ func RegisterPrinter(v any, p api.PrintFunc) {
 	if rt.Kind() == reflect.Pointer {
 		rt = rt.Elem()
 	}
+	log.Println("registered custom printer for", rt.PkgPath()+"."+rt.Name())
 	printer.registry[rt] = p
 }
 
@@ -94,7 +96,7 @@ func printMethods(b *strings.Builder, rt reflect.Type) {
 	if rt.Kind() == reflect.Pointer {
 		it = rt.Elem()
 	}
-	fmt.Fprintf(b, "%s.%s [\n", it.PkgPath(), it.Name())
+	fmt.Fprintf(b, "%s.%s: \n", it.PkgPath(), it.Name())
 	for m := 0; m < rt.NumMethod(); m++ {
 		met := rt.Method(m)
 		if met.IsExported() {
@@ -106,11 +108,10 @@ func printMethods(b *strings.Builder, rt reflect.Type) {
 			fmt.Fprintln(b)
 		}
 	}
-	fmt.Fprintf(b, "]")
 }
 
 func printMethod(b *strings.Builder, met reflect.Method) {
-	fmt.Fprintf(b, "\t%s(", met.Name)
+	fmt.Fprintf(b, "  %s(", met.Name)
 	t := met.Func.Type()
 	if t.Kind() != reflect.Func {
 		fmt.Fprintf(b, "<not a function>:%s", t.Kind().String())
