@@ -82,6 +82,11 @@ func (h *actionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			log.Println("eval", ap.Source)
 		}
 		res = h.runner.RunString(ap.Source)
+	case "browse":
+		if api.Debug {
+			log.Println("browse", ap.Source)
+		}
+		res = h.runner.RunString(fmt.Sprintf("_browse(%s)", ap.Source))
 	case "inspect":
 		if api.Debug {
 			log.Println("inspect", ap.Source)
