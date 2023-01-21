@@ -90,7 +90,6 @@ func newLocalRunner(cfg api.Config) *localRunner {
 	}
 	local.initInternals()
 	if cfg.Setup != nil {
-		log.Println("custom setting up Javascript virtual machine")
 		if err := cfg.Setup(ctx); err != nil {
 			log.Fatal(err)
 		}
