@@ -61,6 +61,12 @@ func (a *actionCommander) Loop() {
 				output(Print(res.RawData), true)
 				continue
 			}
+			if entry == ":w" {
+				if err := openSimonUI(); err != nil {
+					output(err.Error(), false)
+				}
+				continue
+			}
 			if strings.HasPrefix(entry, ":l") {
 				target := ""
 				if arg := entry[2:]; len(arg) > 0 {

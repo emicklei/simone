@@ -41,6 +41,15 @@ func Start(cfg api.Config) {
 	// not inside go-routine because that messes up the logging
 	log.Println("serving HTTP on localhost" + cfg.HttpAddr)
 	go startHTTP(cfg, r)
+
+	// open Workspace
+	if cfg.OpenWorkspace {
+		go func() {
+			if err := openSimonUI(); err != nil {
+				log.Println("open UI failed")
+			}
+		}()
+	}
 	startREPL(r)
 }
 
