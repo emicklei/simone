@@ -62,9 +62,11 @@ func (a *actionCommander) Loop() {
 				continue
 			}
 			if entry == ":w" {
-				if err := openSimonUI(); err != nil {
-					output(err.Error(), false)
-				}
+				go func() { // blocks on exit UI
+					if err := openSimonUI(); err != nil {
+						output(err.Error(), false)
+					}
+				}()
 				continue
 			}
 			if strings.HasPrefix(entry, ":l") {
