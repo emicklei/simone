@@ -88,7 +88,11 @@ func printStructMarkdown(b *strings.Builder, rt reflect.Type, rv reflect.Value) 
 				if fv.Kind() == reflect.Pointer {
 					fv = fv.Elem()
 				}
-				kvs = append(kvs, kv{k: f.Name, v: fv.Interface()})
+				if fv.IsValid() {
+					kvs = append(kvs, kv{k: f.Name, v: fv.Interface()})
+				} else {
+					kvs = append(kvs, kv{k: f.Name})
+				}
 			}
 		}
 	}
@@ -123,6 +127,8 @@ type kv struct {
 func printKVsOn(kvs []kv, b *strings.Builder) {
 	sort.Slice(kvs, func(i, j int) bool { return kvs[i].k < kvs[j].k })
 	for _, each := range kvs {
-		fmt.Fprintf(b, "- %s: %v\n", each.k, each.v)
+		fmt.Fprintf(b, "- %s: ", each.k)
+		printOn(each.v, b)
+		fmt.Fprintln(b)
 	}
 }
