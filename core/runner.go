@@ -175,9 +175,8 @@ func (r *localRunner) showMethods(v any) PlainText {
 	if v == nil {
 		return ""
 	}
-	rt := reflect.TypeOf(v)
 	b := new(strings.Builder)
-	printMethods(b, rt)
+	printDocumentation(b, v)
 	return PlainText(b.String())
 }
 

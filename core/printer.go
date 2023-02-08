@@ -91,58 +91,6 @@ func printOn(v any, b *strings.Builder) {
 	printDefaultOn(v, b)
 }
 
-func printMethods(b *strings.Builder, rt reflect.Type) {
-	it := rt
-	if rt.Kind() == reflect.Pointer {
-		it = rt.Elem()
-	}
-	fmt.Fprintf(b, "%s.%s: \n", it.PkgPath(), it.Name())
-	for m := 0; m < rt.NumMethod(); m++ {
-		met := rt.Method(m)
-		if met.IsExported() {
-			// part of Plugin interface
-			if met.Name == "Init" || met.Name == "Namespace" {
-				continue
-			}
-			printMethod(b, met)
-			fmt.Fprintln(b)
-		}
-	}
-}
-
-func printMethod(b *strings.Builder, met reflect.Method) {
-	fmt.Fprintf(b, "  %s(", met.Name)
-	t := met.Func.Type()
-	if t.Kind() != reflect.Func {
-		fmt.Fprintf(b, "<not a function>:%s", t.Kind().String())
-		return
-	}
-	// 0 = receiver
-	for i := 1; i < t.NumIn(); i++ {
-		if i > 1 {
-			b.WriteString(", ")
-		}
-		b.WriteString(t.In(i).String())
-	}
-	b.WriteString(")")
-	if numOut := t.NumOut(); numOut > 0 {
-		if numOut > 1 {
-			b.WriteString(" (")
-		} else {
-			b.WriteString(" ")
-		}
-		for i := 0; i < t.NumOut(); i++ {
-			if i > 0 {
-				b.WriteString(", ")
-			}
-			b.WriteString(t.Out(i).String())
-		}
-		if numOut > 1 {
-			b.WriteString(")")
-		}
-	}
-}
-
 func printStruct(b *strings.Builder, rt reflect.Type, rv reflect.Value) {
 	if !rv.IsValid() {
 		b.WriteString("null")
