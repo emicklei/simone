@@ -8,8 +8,8 @@ import (
 
 func TestInclude(t *testing.T) {
 	vm := goja.New()
-	vm.Set("include", includeScript)
-	_, err := vm.RunString(`include("../lib/lib.sim") `)
+	initBuiltins(vm)
+	_, err := vm.RunString(`include("../examples/calc.sim") `)
 	if err != nil {
 		t.Fatal(err)
 	}

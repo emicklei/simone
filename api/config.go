@@ -16,8 +16,6 @@ type Config struct {
 	RunScript string
 	// Optional for remote client mode
 	RemoteClient bool
-	// Optional start Simone UI
-	OpenWorkspace bool
 	// Required for CORS
 	Origin string
 	// Optional when running as a service

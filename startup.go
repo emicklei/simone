@@ -14,7 +14,6 @@ var (
 	oRunScript     = flag.String("i", "", "run the script from filename as input")
 	oClient        = flag.Bool("c", false, "start a client REPL")
 	oHelp          = flag.Bool("h", false, "show help")
-	oWindowUI      = flag.Bool("w", false, "open Simone Workspace")
 )
 
 // Start runs the application is one of the modes:
@@ -33,7 +32,6 @@ func Start(cfg api.Config) {
 	cfg.StartupScript = *oStartupScript
 	cfg.RunScript = *oRunScript
 	cfg.RemoteClient = *oClient
-	cfg.OpenWorkspace = *oWindowUI
 	core.Start(cfg)
 }
 
