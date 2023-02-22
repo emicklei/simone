@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/emicklei/simone/api"
 	"github.com/peterh/liner"
@@ -114,10 +115,13 @@ func (a *actionCommander) Loop() {
 		if res.Error != "" {
 			output(res.Error, false)
 		} else {
-			output(Print(res.RawData), true)
+			if res.RawData != NoOutputValue {
+				output(Print(res.RawData), true)
+			}
 		}
 	}
 exit:
+	line.AppendHistory(fmt.Sprintf("// last simone quit at %v", time.Now()))
 	if f, err := os.Create(hist); err != nil {
 		log.Print("Error writing history file: ", err)
 	} else {
@@ -126,7 +130,14 @@ exit:
 	}
 }
 
+// NoOutputValue is a value to return from a function to prevent output.
+var NoOutputValue = struct{}{}
+var NoOutputValueString = "__NoOutputValueString"
+
 func output(v any, ok bool) {
+	if v == NoOutputValue || v == NoOutputValueString {
+		return
+	}
 	if !ok {
 		fmt.Printf("\033[1;31m%v\033[0m\n", v)
 	} else {

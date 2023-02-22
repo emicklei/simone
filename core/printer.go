@@ -31,6 +31,9 @@ type Printer struct {
 }
 
 func Print(v any) string {
+	if v == NoOutputValue || v == NoOutputValueString {
+		return NoOutputValueString
+	}
 	b := new(strings.Builder)
 	printOn(v, b)
 	return b.String()

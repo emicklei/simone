@@ -11,8 +11,7 @@ import (
 
 func main() {
 	cfg := api.Config{
-		HttpAddr: ":9119",
-		Plugins:  []api.Plugin{new(Demo), new(fs.Plugin)},
+		Plugins: []api.Plugin{new(Demo), new(fs.Plugin)},
 	}
 	simone.RegisterPrinter(time.Now(), printTime)
 

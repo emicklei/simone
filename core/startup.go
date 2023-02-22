@@ -38,6 +38,15 @@ func Start(cfg api.Config) {
 	if initFilename := cfg.StartupScript; initFilename != "" {
 		r.Include(initFilename)
 	}
+
+	// check cfg
+	if cfg.HttpAddr == "" {
+		port := "9119"
+		if p := os.Getenv("PORT"); p != "" {
+			port = p
+		}
+		cfg.HttpAddr = ":" + port
+	}
 	// not inside go-routine because that messes up the logging
 	log.Println("serving HTTP on localhost" + cfg.HttpAddr)
 	go startHTTP(cfg, r)
@@ -70,8 +79,12 @@ func startHTTP(cfg api.Config, r runnable) {
 // startREPL is blocking
 func startREPL(r runnable) {
 	cmd := newActionCommander(r)
-	loginfo("simone - a Javascript engine service")
-	fmt.Printf("\033[1;32m%s\033[0m\n", ":q (quit) :h (help) :v (variables) :p (plugins) :l (login) :d (verbose)")
+	loginfo("simone - an extensible Javascript engine service")
+	printHelp()
 	cmd.Loop()
 	loginfo("simone says bye!")
+}
+
+func printHelp() {
+	fmt.Printf("\033[1;32m%s\033[0m\n", ":q (quit) :h (help) :v (variables) :p (plugins) :l (login) :d (verbose)")
 }

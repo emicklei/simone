@@ -123,6 +123,8 @@ func (r *localRunner) RunString(entry string) api.EvalResult {
 			// no error
 			res.RawData = val
 			res.Datatype = fmt.Sprintf("%T", val)
+			// remember the last if ok
+			r.vm.Set("_", val)
 		}
 	}
 	return res
@@ -141,7 +143,7 @@ func (r *localRunner) initInternals() {
 
 func (r *localRunner) browseObject(v any) any {
 	if v == nil {
-		return "null"
+		return NoOutputValue
 	}
 	// store value in temporary variable TODO cleanup?
 	key := "_" + randSeq(10) // make it internal such that :v will not show it
@@ -180,8 +182,9 @@ func (r *localRunner) showMethods(v any) PlainText {
 	return PlainText(b.String())
 }
 
-func (r *localRunner) showHelp() string {
-	return "no help yet"
+func (r *localRunner) showHelp() any {
+	printHelp()
+	return NoOutputValue
 }
 
 func (r *localRunner) toggleDebug() {

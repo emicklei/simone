@@ -45,6 +45,7 @@ Commands start with the colon `:` prefix.
 
 If you postfix a variable (or plugin) with a `?` then it will print all available functions.
 If you postfix an entry with a `!` then it browse the result in a Web page.
+The last expression value is stored in the variable `_`.
 
 ## usage HTTP
 
@@ -52,6 +53,7 @@ If you postfix an entry with a `!` then it browse the result in a Web page.
 
 For POST the source is transported with the request body
 For GET the source can be passed as a query parameter.
+You can change the HTTP listen port by passing the `PORT` environment variable.
 
 | action | description
 | - | -
