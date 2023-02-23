@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime/debug"
 	"strings"
 	"time"
 
@@ -148,7 +149,8 @@ func output(v any, ok bool) {
 func (a *actionCommander) RunString(entry string) api.EvalResult {
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Printf("\033[1;31mdo not panic:%v\033[0m\n", r)
+			fmt.Printf("\033[1;31msimone says, do not panic (see log for stack) : %v\033[0m\n", r)
+			os.WriteFile("simone-panic.log", debug.Stack(), os.ModePerm)
 		}
 	}()
 	return a.runner.RunString(entry)

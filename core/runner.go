@@ -79,6 +79,8 @@ func newLocalRunner(cfg api.Config) *localRunner {
 		loginCallbacks: map[string]api.LoginFunc{}}
 	initBuiltins(vm)
 	var ctx api.PluginContext = local
+	// last value is null
+	vm.Set("_", nil)
 	// init all plugins
 	for _, each := range cfg.Plugins {
 		ns := each.Namespace()
