@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 )
 
@@ -33,6 +34,13 @@ type RuntimeSetupFunc func(ctx PluginContext) error
 
 // HostPort returns host:port
 func (c Config) HostPort() string {
+	if c.HttpAddr == "" {
+		port := "9119"
+		if p := os.Getenv("PORT"); p != "" {
+			port = p
+		}
+		return fmt.Sprintf("localhost:%s", port)
+	}
 	if strings.HasPrefix(c.HttpAddr, ":") {
 		return fmt.Sprintf("localhost%s", c.HttpAddr)
 	}

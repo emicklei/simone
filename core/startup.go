@@ -48,7 +48,7 @@ func Start(cfg api.Config) {
 		cfg.HttpAddr = ":" + port
 	}
 	// not inside go-routine because that messes up the logging
-	log.Println("serving HTTP on localhost" + cfg.HttpAddr)
+	log.Println("serving HTTP on http://localhost" + cfg.HttpAddr)
 	go startHTTP(cfg, r)
 
 	startREPL(r)
