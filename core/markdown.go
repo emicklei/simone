@@ -25,6 +25,10 @@ func printMarkdownOn(v any, b *strings.Builder) {
 	// check for struct
 	rt := reflect.TypeOf(v)
 	rv := reflect.ValueOf(v)
+	if p, ok := v.(api.Plugin); ok {
+		printPluginMarkdownOn(p, b)
+		return
+	}
 	if rt.Kind() == reflect.Slice {
 		printSliceMarkdownOn(rv, rt, b)
 		return
@@ -130,5 +134,20 @@ func printKVsOn(kvs []kv, b *strings.Builder) {
 		fmt.Fprintf(b, "- %s: ", each.k)
 		printOn(each.v, b)
 		fmt.Fprintln(b)
+	}
+}
+
+func printPluginMarkdownOn(p api.Plugin, b *strings.Builder) {
+	it := reflect.TypeOf(p)
+	if it.Kind() == reflect.Pointer {
+		it = it.Elem()
+	}
+	fmt.Fprintf(b, "%s.%s\n", it.PkgPath(), it.Name())
+	if ms, ok := p.(api.HasMethodSignatures); ok {
+		sigs := ms.MethodSignatures()
+		sort.Sort(sort.StringSlice(sigs))
+		for _, each := range sigs {
+			fmt.Fprintf(b, "- %s\n", each)
+		}
 	}
 }
