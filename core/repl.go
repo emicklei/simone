@@ -6,7 +6,6 @@ import (
 	"os"
 	"runtime/debug"
 	"strings"
-	"time"
 
 	"github.com/emicklei/simone/api"
 	"github.com/peterh/liner"
@@ -111,7 +110,9 @@ func (a *actionCommander) Loop() {
 			}
 			continue
 		}
-		line.AppendHistory(entry)
+		if !strings.HasPrefix(entry, "_") {
+			line.AppendHistory(entry)
+		}
 		res := a.RunString(entry)
 		if res.Error != "" {
 			output(res.Error, false)
@@ -122,7 +123,6 @@ func (a *actionCommander) Loop() {
 		}
 	}
 exit:
-	line.AppendHistory(fmt.Sprintf("// last simone quit at %v", time.Now()))
 	if f, err := os.Create(hist); err != nil {
 		log.Print("Error writing history file: ", err)
 	} else {

@@ -1,6 +1,7 @@
 package fs
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 
@@ -43,4 +44,20 @@ func (s *Plugin) Chdir(path string) string {
 		abs, _ := filepath.Abs(s.workdir)
 		return abs
 	}
+}
+
+func (s *Plugin) WriteFile(value any, name string) error {
+	var data []byte
+	if s, ok := value.(string); ok {
+		data = []byte(s)
+	} else if d, ok := value.([]byte); ok {
+		data = d
+	} else {
+		d, err := json.MarshalIndent(value, "", "    ")
+		if err != nil {
+			return err
+		}
+		data = d
+	}
+	return os.WriteFile(name, data, os.ModePerm)
 }
