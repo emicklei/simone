@@ -117,7 +117,7 @@ func (a *actionCommander) Loop() {
 		if res.Error != "" {
 			output(res.Error, false)
 		} else {
-			if res.RawData != NoOutputValue {
+			if res.RawData != api.NoOutputValue {
 				output(Print(res.RawData), true)
 			}
 		}
@@ -131,12 +131,8 @@ exit:
 	}
 }
 
-// NoOutputValue is a value to return from a function to prevent output.
-var NoOutputValue = struct{}{}
-var NoOutputValueString = "__NoOutputValueString"
-
 func output(v any, ok bool) {
-	if v == NoOutputValue || v == NoOutputValueString {
+	if v == api.NoOutputValue || v == api.NoOutputValueString {
 		return
 	}
 	if !ok {

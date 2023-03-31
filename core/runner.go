@@ -145,7 +145,7 @@ func (r *localRunner) initInternals() {
 
 func (r *localRunner) browseObject(v any) any {
 	if v == nil {
-		return NoOutputValue
+		return api.NoOutputValue
 	}
 	// store value in temporary variable TODO cleanup?
 	key := "_" + randSeq(10) // make it internal such that :v will not show it
@@ -186,7 +186,7 @@ func (r *localRunner) showMethods(v any) PlainText {
 
 func (r *localRunner) showHelp() any {
 	printHelp()
-	return NoOutputValue
+	return api.NoOutputValue
 }
 
 func (r *localRunner) toggleDebug() {

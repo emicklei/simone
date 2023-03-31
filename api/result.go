@@ -22,3 +22,7 @@ type HoverResult struct {
 type AccessPath struct {
 	Expression string
 }
+
+// NoOutputValue is a value to return from a function to prevent output.
+var NoOutputValue = struct{}{}
+var NoOutputValueString = "__NoOutputValueString"

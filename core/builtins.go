@@ -7,12 +7,13 @@ import (
 	"path/filepath"
 
 	"github.com/dop251/goja"
+	"github.com/emicklei/simone/api"
 )
 
 func initBuiltins(vm *goja.Runtime) {
 	vm.Set("log", func(arg ...any) any {
 		log.Println(arg...)
-		return NoOutputValue
+		return api.NoOutputValue
 	})
 	vm.RunScript("console.log", `
 	console={};
