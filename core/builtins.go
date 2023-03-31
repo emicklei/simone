@@ -10,9 +10,14 @@ import (
 )
 
 func initBuiltins(vm *goja.Runtime) {
-	vm.Set("log", func(arg ...any) {
+	vm.Set("log", func(arg ...any) any {
 		log.Println(arg...)
+		return NoOutputValue
 	})
+	vm.RunScript("console.log", `
+	console={};
+	console.log=log;
+	`)
 	vm.Set("include", includer{vm: vm}.includeScript)
 }
 

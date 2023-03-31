@@ -28,8 +28,9 @@ See `examples` for a minimal program.
 
 ## builtin functions
 
-    log(arg,arg,...);    // write log line
-    include('lib.sim');  // evaluate script from file
+    console.log(arg,arg,...); // write log line
+    log(arg,arg,...);         // write log line (short version)
+    include('lib.sim');       // evaluate script from file
 
 ## usage REPL
 
