@@ -84,7 +84,7 @@ func newLocalRunner(cfg api.Config) *localRunner {
 	// init all plugins
 	for _, each := range cfg.Plugins {
 		ns := each.Namespace()
-		log.Printf("init plugin %s (%T)\n", ns, each)
+		log.Printf("init plugin %s\n", ns)
 		vm.Set(ns, each)
 		if err := each.Init(ctx); err != nil {
 			log.Fatal(err)
