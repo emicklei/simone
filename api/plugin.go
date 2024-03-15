@@ -24,8 +24,3 @@ type PluginContext interface {
 	// OnLogin adds the loginHandler which is called when using the `:l (login)` feature.
 	OnLogin(plugin Plugin, loginHandler LoginFunc)
 }
-
-// HasMethodSignatures is for plugin that describe their public interface
-type HasMethodSignatures interface {
-	MethodSignatures() []string
-}

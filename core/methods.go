@@ -3,36 +3,12 @@ package core
 import (
 	"fmt"
 	"reflect"
-	"sort"
 	"strings"
-
-	"github.com/emicklei/simone/api"
 )
 
 func printDocumentation(b *strings.Builder, v any) {
 	// see if value has MethodSignatures
 	rt := reflect.TypeOf(v)
-	if ms, ok := v.(api.HasMethodSignatures); ok {
-		it := rt
-		if rt.Kind() == reflect.Pointer {
-			it = rt.Elem()
-		}
-		fmt.Fprintf(b, "%s.%s\n", it.PkgPath(), it.Name())
-		hadComment := false
-		sigs := ms.MethodSignatures()
-		sort.Sort(sort.StringSlice(sigs))
-		for i, each := range sigs {
-			if i > 0 {
-				fmt.Fprintln(b)
-			}
-			if hadComment {
-				fmt.Fprintln(b)
-			}
-			fmt.Fprintf(b, "\t%s", each)
-			hadComment = strings.HasPrefix(each, "//")
-		}
-		return
-	}
 	printMethods(b, rt)
 }
 

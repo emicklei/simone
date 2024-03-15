@@ -143,11 +143,4 @@ func printPluginMarkdownOn(p api.Plugin, b *strings.Builder) {
 		it = it.Elem()
 	}
 	fmt.Fprintf(b, "%s.%s\n", it.PkgPath(), it.Name())
-	if ms, ok := p.(api.HasMethodSignatures); ok {
-		sigs := ms.MethodSignatures()
-		sort.Sort(sort.StringSlice(sigs))
-		for _, each := range sigs {
-			fmt.Fprintf(b, "- %s\n", each)
-		}
-	}
 }
