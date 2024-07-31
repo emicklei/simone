@@ -45,7 +45,7 @@ Commands start with the colon `:` prefix.
 |:p| show list of available plugin names
 
 If you postfix a variable (or plugin) with a `?` then it will print all available functions.
-If you postfix an entry with a `!` then it browse the result in a Web page.
+If you postfix an entry with a `!` then it browses the result in a Web page.
 The last expression value is stored in the variable `_`.
 
 ## usage HTTP

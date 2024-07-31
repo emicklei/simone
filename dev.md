@@ -1,2 +1,1 @@
-- refactor plugin interface; separate plugin from namespace name 
 - handle {} (*status.Error)
