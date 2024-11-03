@@ -16,7 +16,7 @@ var (
 	oHelp          = flag.Bool("h", false, "show help")
 )
 
-// Start runs the application is one of the modes:
+// Start runs the application in one of the modes:
 // - local evaluate a script from file
 // - http service + REPL
 // - http client + REPL
