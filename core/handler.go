@@ -99,7 +99,7 @@ func (h *actionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if api.Debug {
 			log.Println("unknown or empty action:", ap.Action)
 		}
-		res.Error = fmt.Sprintf("unknown or empty action:" + ap.Action)
+		res.Error = fmt.Sprintf("unknown or empty action:%v", ap.Action)
 	}
 	if res.Error != "" {
 		log.Println("error:", res.Error)

@@ -108,7 +108,7 @@ func printStruct(b *strings.Builder, rt reflect.Type, rv reflect.Value) {
 				b.WriteString(", ")
 			}
 			b.WriteRune('"')
-			fmt.Fprintf(b, f.Name)
+			fmt.Fprint(b, f.Name)
 			b.WriteRune('"')
 			fv := rv.Field(i)
 			b.WriteRune(':')
